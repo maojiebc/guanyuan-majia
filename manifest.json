@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/skill-manifest",
   "name": "guanyuan-majia",
   "displayName": "Guanyuan-Majia · Guandata BI Skill",
-  "version": "1.4.0",
-  "description": "Tool-agnostic Claude Code / OpenClaw / Codex / Hermes skill for Guandata BI (观远 BI). Three capabilities: data query & card creation (Part A), ETL governance & write (Part B), custom chart dev & debugging (Part C). Battle-tested with 60+ ETL operations.",
+  "version": "1.5.0",
+  "description": "Tool-agnostic Claude Code / OpenClaw / Codex / Hermes skill for Guandata BI (观远 BI). Three capabilities: data query & card creation (Part A), ETL governance & write (Part B, incl. SmartETL full-chain rewrite & ExecPlan), custom chart dev & debugging (Part C). Battle-tested with 60+ ETL operations. V1.5.0 refactored into progressive disclosure: SKILL.md is the router (913 lines, ~48 KB), references/ holds detailed playbooks (8 new files). Installable via `npx @supermajia/guanyuan-bi install` (introduced in V1.4.0).",
   "license": "MIT",
   "author": "maojiebc",
   "homepage": "https://github.com/maojiebc/guanyuan-majia",
@@ -34,6 +34,7 @@
     }
   },
   "triggers": {
+    "_note": "Legacy field kept for backward compatibility. The single source of truth for triggering is SKILL.md frontmatter `description`. All known target agents (Claude Code, OpenClaw, Codex, Hermes) read description, not manifest.triggers — keeping these in sync was overhead. Refresh from SKILL.md description if you intend to consume them.",
     "partA": [
       "查数据", "做图表", "看报表", "营业额", "门店", "会员", "订单", "建卡", "取数", "删卡",
       "create card", "fetch data", "make chart", "data analysis"

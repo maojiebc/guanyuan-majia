@@ -1,10 +1,12 @@
 ---
 name: guanyuan-majia
-description: 观远 BI（马甲专版 V1.3）— 数据查询/建卡/取数 + ETL 治理/写入/删除 + 自定义图表开发 全链路。Part A：用 guandata.py 做数据获取与分析（list-datasets / get-columns / search-values / create-and-get / create-card / get-card-data / delete-cards / create-page / release-page / list-pages）+ guancli 只读探索（ds/etl/page/card/metric/task/form/fetch）。Part B：用 guancli 做 ETL 治理与写入全链路（POST /api/directory ETL/DATA_SET 双树建目录、POST /api/etl/direct-save create+update 同接口、POST /api/etl/execute、GET /api/task 拿真实错误、DELETE /api/data-source 先于 DELETE /api/etl、批量扫描判断 ETL/字段去留、ODS/DIM/DWD/DWS/APP 五层分层、字段使用度双源审计、v2→v3 批量改造 SDK、CTO 张进的 SmartETL 全链路重写方法论：全链路追到原始源/旧资产只读/新链只允许 SQL 节点/双层结构+数值验收/副本页卡片级验收/差异追踪 5 步法/空快照处理标准/ExecPlan+modeling+evidence 交付物），10 类高频报错修复。Part C：自定义图表 HTML/CSS/JS 注入开发与排障（renderChart 4 参数 runtime 契约、payload_json 截断判断、固定卡片/overlay/z-index/stacking context、复制页 card id 重定位、懒加载 iframe、路由切换销毁注入物、live 浏览器验收、payload_json 拆列方案）。触发词：查数据、做图表、看报表、营业额、门店、会员、订单、分析、建卡、取数、删卡、ETL 治理、循环依赖、字段使用度、新建 ETL、修改 ETL、direct-save、ETL 报错、execute 失败、批量迁移 ETL、SmartETL 改写、全链路重写、副本页验收、差异追踪、空快照、自定义图表、HTML 注入、JS 注入、payload_json、overlay、固定卡片、z-index、看 BI HTTP API。
-version: "1.4.0"
+description: 观远 BI（Guandata）全链路操作 — 数据查询/建卡/取数（Part A）、ETL 治理/写入/删除（Part B，含 SmartETL 全链路重写 + 字段使用度审计 + ExecPlan 工程化）、自定义图表 HTML/CSS/JS 注入与排障（Part C）。当用户提到 营业额/门店/会员/订单/建卡/取数/报表/ETL/direct-save/payload_json/自定义图表/观远/Guandata/BI 时使用。马甲业务实战版，60+ ETL 战例、10 类报错手册、Claude Code/OpenClaw/Codex/Hermes 通用。
+version: "1.5.0"
 ---
 
-# 观远 BI · 马甲专版（V1.4.0）
+# 观远 BI · 马甲专版（V1.5.0）
+
+> **结构说明（V1.5.0 引入 progressive disclosure）**：本文档是**路由层 + 关键规则**，详细操作手册下沉到 `references/`。每个 Part 的入口章节会指出"何时回到 references/ 查全表"。完整章节索引见末尾的 [📚 References 目录](#-references-目录)。
 
 ## 🧭 Part 选择
 
@@ -12,33 +14,31 @@ version: "1.4.0"
 |---|---|
 | 查数据、建卡、生成报表、做分析 | **Part A：数据查询与卡片创建** |
 | 扫整库 ETL 治理 / 新建/修改/删除 ETL / 字段使用度审计 / 修复 ETL 报错 | **Part B：ETL 治理与写入** |
-| 把整条 SmartETL 链改写成 SQL 版 + 页面副本验收 + 差异定位 + 空快照阻塞 | **Part B-17：全链路重写方法论** |
-| 30+ 张表批量迁移 / 跨多日工程 / 复杂重构需要项目化追踪 | **Part B-17.11：ExecPlan 工作法**（V1.2 新增） |
+| 把整条 SmartETL 链改写成 SQL 版 + 页面副本验收 + 差异定位 + 空快照阻塞 | **Part B-17：全链路重写方法论**（拆到 [references/part-b17-fullchain-rewrite.md](references/part-b17-fullchain-rewrite.md)） |
+| 30+ 张表批量迁移 / 跨多日工程 / 复杂重构需要项目化追踪 | **B-17.11 ExecPlan 工作法**（同上文件 §11） |
 | 自定义图表 HTML/CSS/JS 注入、固定卡片/overlay、payload_json 取数、路由清理 | **Part C：自定义图表开发与排障** |
-| 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读章节末尾的"实战 ID 速查" |
+| 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读各 Part 章节末尾的"实战 ID 速查" |
 
 > **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）+ OpenAI Codex（V1.2 ExecPlan 规范）
-> **版本**：V1.4.0（2026-05-09）· **npm 包**：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi) · **作用域**：本地私有 BI 实例
+> **版本**：V1.5.0（2026-05-09）· **npm 包**：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi)（一行 `npx @supermajia/guanyuan-bi install`）· **作用域**：本地私有 BI 实例
 > **兼容工具**：Claude Code · OpenClaw · Codex · Hermes (gbrain) · 任何支持 `SKILL.md` frontmatter 的 agent。详见仓库根 [README · 兼容性](README.md#-兼容性--compatibility) 与 [AGENTS.md](AGENTS.md)。
 
 ---
 
 # 🅰️ Part A：数据查询与卡片创建
 
-## 🔴 操作前必读（不可跳过）
-
 ## ⚠️ 关键规则
 
 **所有数值计算必须跑代码** — 禁止在思考中直接口算百分比、环比、除法等。
+
 1. **必须提供 pg_id** — 不保存的卡片无法取数据
 2. **先查页面权限** — 用 `list-pages --manageable` 找有权限的页面，不用翻 JSON
 3. **筛选值按需查** — 只有用了分类筛选（`IN`/`EQ`/`CONTAINS`）才需要 `search-values`；纯日期范围（`BT`）不需要
 4. **图表类型限制** — 超出 metric/row/column 上限会返回空数据
 5. **必须确认数据范围** — 用户没有明确指定日期范围时，**必须追问**，不要自己假设。例如："你想看哪段时间的数据？" 或提供选项："要看今天、本周还是上月？"
 
+**遇到意外的错误以及得到新的教训立即更新：** 遇到意外的错误立即把它落到 SKILL.md 对应的章节（Part B 报错走 `references/part-b-errors.md`，Part C 走 `references/part-c-payload-json.md` 等）或 ExecPlan 的 `Surprises & Discoveries` 章节（B-17.11）。格式：
 
-
-**遇到意外的错误以及得到新的教训立即更新：** 遇到意外的错误立即把它落到 SKILL.md 对应的章节（Part B 报错走 B-9，Part C 走 C-3 等）或 ExecPlan 的 `Surprises & Discoveries` 章节（B-17.11）。格式：
 ```markdown
 ### [YYYY-MM-DD] 简要标题
 - **场景**: 什么情况下遇到的
@@ -48,15 +48,11 @@ version: "1.4.0"
 
 ## 基本信息
 
-> 路径约定：以下命令假定 cwd 是 skill 安装目录。Skill 路径因 agent 工具不同而异（见仓库根 [README](README.md) 的兼容性表）：Claude Code 在 `~/.claude/skills/guanyuan-majia/`，OpenClaw 在 `~/.openclaw/skills/guanyuan-majia/`，Codex 在 `~/.codex/skills/guanyuan-majia/`，Hermes 在 `<workspace>/skills/guanyuan-majia/`。所有 Part A 命令都用相对路径 `scripts/guandata.py`，无需修改。
+> 路径约定：以下命令假定 cwd 是 skill 安装目录。Skill 路径因 agent 工具不同而异（见 [README](README.md) 的兼容性表）：Claude Code 在 `~/.claude/skills/guanyuan-majia/`，OpenClaw 在 `~/.openclaw/skills/guanyuan-majia/`，Codex 在 `~/.codex/skills/guanyuan-majia/`，Hermes 在 `<workspace>/skills/guanyuan-majia/`。所有 Part A 命令都用相对路径 `scripts/guandata.py`，无需修改。
 
 - 配置文件: `config.json`（**含明文凭据，已被 .gitignore 排除**）
 - 脚本: `scripts/guandata.py`
-
-## 运行环境
-- **Python 3.8+**
-- **依赖库**: `httpx`（`pip install httpx`）
-- 凭据存储在 `config.json` 中（明文），仅供本地使用，切勿提交到公开仓库
+- 运行环境：Python 3.8+，依赖 `httpx`（`pip install httpx`）
 
 ## 配置说明
 
@@ -76,550 +72,57 @@ version: "1.4.0"
 
 | 字段 | 必填 | 说明 |
 |------|------|------|
-| `version` | ✅ | 观远BI版本：`"6"` 或 `"7"`。<br>• `"6"`：观远BI 6.x，直接保存卡片<br>• `"7"`：观远BI 7.0+，使用 draft/release 机制（创建卡片后自动发布页面） |
+| `version` | ✅ | 观远BI版本：`"6"`（直接保存卡片）或 `"7"`（7.0+ draft/release 机制，自动发布） |
 | `base_url` | ✅ | 观远BI服务器地址，如 `https://bi.company.com:8080` |
 | `domain` | ✅ | 登录域，通常为 `guanbi`，具体咨询你们的BI管理员 |
-| `login_id` | ✅ | 观远BI登录账号 |
-| `password` | ✅ | 观远BI登录密码 |
-| `default_pg_id` | | 默认页面ID。不传时，`create-and-get` 需手动指定 `pg_id`；传入后可省略 |
+| `login_id` / `password` | ✅ | 观远BI登录账号/密码 |
+| `default_pg_id` | | 默认页面ID。不传时，`create-and-get` 需手动指定 `pg_id` |
 | `default_folder_id` | | 默认文件夹ID。创建新页面时的存放位置 |
 
-### 如何获取 pg_id / folder_id
+**如何获取 pg_id / folder_id**：在观远BI网页打开目标页面，URL 中的 `pgId=xxx` 即为页面ID；文件夹ID在「数据管理」→「目录」中查看。
 
-1. 在观远BI网页打开目标页面，URL 中的 `pgId=xxx` 即为页面ID
-2. 文件夹ID在观远BI「数据管理」→「目录」中查看
-
-## 核心命令
+## 命令骨架（最常用 8 条）
 
 ```bash
 SCRIPT="python3 scripts/guandata.py"
 
-# 查数据集（默认读本地缓存）
-$SCRIPT list-datasets
-$SCRIPT list-datasets --columns   # 同时显示每个数据集的字段
-$SCRIPT list-datasets --refresh   # 强制刷新缓存（数据源有变更时用）
+# 探索
+$SCRIPT list-datasets [--columns] [--refresh]    # 数据集（默认走缓存）
+$SCRIPT get-columns <ds_id> [--with-calc]        # 字段（含计算字段）
+$SCRIPT search-values <ds_id> --name "字段名" --search "关键词"   # 枚举值
 
-# 查字段（默认读本地缓存，自动包含计算字段）
-$SCRIPT get-columns <ds_id>             # 输出原始字段 + 计算字段
-$SCRIPT get-columns <ds_id> --refresh   # 强制刷新缓存
-$SCRIPT get-columns <ds_id> --with-calc # 同时显示计算字段（公式字段）
+# 建卡 / 取数
+$SCRIPT create-and-get '<json>'   # 建卡 + 取数（一步到位）
+$SCRIPT create-card '<json>'      # 仅建卡
+$SCRIPT get-card-data <card_id>   # 取已存在卡片的数据
 
-# 查枚举值（筛选前必查，避免值不存在）
-# fd_id 从 get-columns 输出第二列拿
-$SCRIPT search-values <ds_id> <fd_id> --search "关键词"
-$SCRIPT search-values <ds_id> --name "门店名称" --search "某门店"  # 用字段名代替 fd_id
-
-# 建卡+取数（一步到位）
-$SCRIPT create-and-get '{"name":"卡片名","ds_id":"数据集ID","chart_type":"SINGLE_VALUE","pg_id":"页面ID","metric":[{"name":"会员id","aggr":"CNT_DISTINCT"}],"filters":[{"name":"营业日期","op":"BT","value":["2026-02-01","2026-02-28"]}]}'
-$SCRIPT create-and-get '{...}' --limit 200   # 限制返回200行数据（默认500行上限）
-
-# 建卡+取数（组合图，metric_additional 传折线叠加数据）
-$SCRIPT create-and-get '{"name":"达成率趋势","ds_id":"数据集ID","chart_type":"STACKED_COLUMN_WITH_LINE","pg_id":"页面ID","metric":[{"name":"营业额","aggr":"SUM"}],"metric_additional":[{"name":"人数","aggr":"SUM"}],"row":["营业日期(月)"],"column":["销售类型"],"filters":[...]}'
-
-# 仅建卡（不取数）
-$SCRIPT create-card '{...}'
-
-# 取卡片数据（含筛选条件）
-$SCRIPT get-card-data <card_id>
-
-# 列页面
-$SCRIPT list-pages
-$SCRIPT list-pages --manageable  # 只显示有编辑权限的页面（日常用这个）
-
-# 注意：list-datasets 默认显示父文件夹ID
-# 输出格式示例：
-#   数据集名称
-#     ID: 数据集ID  |  行数  列数  |  状态
-#     父文件夹ID: 父文件夹ID
-#     描述: 描述信息
-#     路径: 目录路径
-
-# 创建页面
-$SCRIPT create-page "页面名称"
-$SCRIPT create-page "页面名称" --parent-dir "目录ID" --desc "描述"
-
-# 获取页面卡片列表
-$SCRIPT get-page-cards <pg_id>
-
-# 批量删除卡片（需要 pg_id）
+# 页面 / 卡片管理
+$SCRIPT list-pages --manageable   # 有编辑权限的页面（日常用这个）
 $SCRIPT delete-cards <pg_id> <card_id1> <card_id2> ...
 ```
 
-## 💾 数据缓存机制
-**`create-and-get`、`get-card-data` 命令都会自动将数据保存到本地 CSV 缓存文件。**
+> **完整命令清单**（含 `--task` 缓存隔离、`create-page` / `release-page` / `get-page-cards`、缓存清理、CSV 缓存使用规范）见 **[references/part-a-commands.md](references/part-a-commands.md)**。
 
-输出末尾会显示缓存路径：`📁 缓存: .cache/data/xxx.csv`
+## 写卡片前必读
 
-### 缓存目录结构
+`create-and-get` / `create-card` 的 JSON 参数有 13 个字段，2 种格式（metric/filters/sorting/字段名/filterType），26 种 `chart_type`，6 种日期粒度。**写卡前先回到参考表**：
 
-```
-.cache/
-├── data/                   # 数据查询缓存（CSV），默认共享目录
-├── datasets/               # 数据集列表缓存（JSON）
-├── columns/                # 字段列表缓存（JSON）
-└── tasks/                  # 按任务隔离的缓存（使用 --task 参数时）
-    └── {task_name}/
-        ├── data/
-        ├── datasets/
-        └── columns/
-```
+📖 **[references/part-a-cards.md](references/part-a-cards.md)** — 完整参数表 + 26 种图表类型 + metric/filters/sorting/字段名/filterType 全格式 + 6 个建卡示例（指标卡 / 柱状图 / 交叉表 / 多线图 / 组合图 / 气泡图）+ 完整工作流示例 + 自定义公式字段 `custom_fields`。
 
-### 按任务隔离缓存（--task）
+## guancli 补充：只读探索 + 表单 CRUD
 
-不同任务的缓存混在一起时，用 `--task` 参数按任务名分组。**`--task` 放在子命令前面：**
+**guandata.py vs guancli 分工**：
+- **guandata.py** → 建卡、取数、删卡、发布页面（**写**操作）
+- **guancli** → 搜索、探索、ETL/指标/任务/表单（**读**操作 + 表单 CRUD）
 
-```bash
-# 堂食分析任务 → .cache/tasks/堂食分析/data/
-$SCRIPT --task "品类分析" create-and-get '{"name":"品类","ds_id":"<dataset_id>",...}'
+**何时用 guancli 替代 list-datasets / list-pages**：
+- 库里数据集/页面很多 → `guancli ds search "关键词" --brief` 比全量拉取省 50%+ token
+- 想看某 ETL 的 SQL/血缘/节点列表 → `guancli etl get <id> --brief`（`guandata.py` 没有此能力）
+- 任务排查 → `guancli task running` / `guancli task get <task_id>`
+- 表单 CRUD → `guancli form list/schema/query/add/update/delete`
+- 调未封装的 BI API → `guancli fetch <METHOD> <path>`（万能兜底）
 
-# 查字段也隔离
-$SCRIPT --task "会员分析" get-columns <dataset_id>
-```
-
-不加 `--task` 时，缓存仍在默认的 `.cache/data/` 共享目录。
-
-### 缓存清理
-
-当缓存占用过多空间或数据过期时，需要清理缓存：
-
-```bash
-# 清理所有数据查询缓存（保留最近7天）
-find .cache/data -name "*.csv" -mtime +7 -delete
-
-# 清理所有缓存（彻底清空）
-rm -rf .cache/*
-```
-
-### 缓存文件格式
-
-CSV，首行为表头，后续行为数据。用 Excel / pandas / csv 模块直接读即可。
-
-### 大模型使用规范
-
-**当拿到取数结果后，必须用缓存文件处理数据，不要把大量数据塞进上下文。**
-
-正确做法：
-```python
-import csv
-# 1. 从输出中提取缓存路径
-# 2. 用代码读取缓存
-with open('.cache/data/xxx.csv', encoding='utf-8-sig') as f:
-    reader = csv.reader(f)
-    headers = next(reader)
-    rows = list(reader)
-# headers[j] 是第 j 列的字段名
-# rows[i][j] 是第 i 行第 j 列的值（字符串）
-```
-
-## create-and-get / create-card 参数说明
-
-`create-and-get` 和 `create-card` 共用以下参数格式：
-
-| 参数 | 必填 | 类型 | 说明 | 类比 SQL |
-|------|------|------|------|----------|
-| `name` | ✅ | string | 卡片名称 | - |
-| `ds_id` | ✅ | string | 数据集 ID（用 `list-datasets` 查） | `FROM 表` |
-| `chart_type` | ✅ | string | 图表类型（见下方速查表） | - |
-| `pg_id` | ✅ | string | 保存到的页面 ID（用 `list-pages --manageable` 找） | - |
-| `row` | | list | 行维度（分组依据） | `GROUP BY` |
-| `column` | | list | 列维度（横向拆列） | 交叉表列头 |
-| `metric` | | list | 数值（要算的指标） | `SUM/AVG/COUNT` |
-| `metric_additional` | | list | 叠加数值（组合图专用：柱+线的线） | - |
-| `color_by` | | list | 颜色分组（气泡图/散点图） | - |
-| `size_by` | | list | 气泡大小（气泡图专用） | - |
-| `filters` | | list | 筛选条件 | `WHERE` |
-| `sorting` | | list | 排序 | `ORDER BY` |
-| `custom_fields` | | list | 自定义公式字段（动态创建计算列） | `SELECT ... , SUM(x)/SUM(y) AS 别名` |
-
-举例说明：
-```json
-{
-  "row": ["城市"],                        // 按城市分行
-  "column": ["销售类型名称"],              // 堂食/外卖拆成两列
-  "metric": [{"name": "毛营业额", "aggr": "SUM"}],  // 每格填营业额总和
-  "filters": [{"name": "营业日期", "op": "BT", "value": ["2026-01-01", "2026-02-28"]}],  // 只看1-2月
-  "sorting": [{"name": "毛营业额", "order": "DESC"}]  // 按营业额降序排
-}
-// 等价于: SELECT 城市, 销售类型名称, SUM(毛营业额) FROM 表 WHERE 营业日期 BETWEEN ... GROUP BY 城市, 销售类型名称 ORDER BY SUM(毛营业额) DESC
-```
-
-### 自定义公式字段（custom_fields）
-
-在创建卡片时动态添加计算字段，无需提前在观远界面建好：
-
-```bash
-$SCRIPT create-and-get '{
-  "name": "成本率分析",
-  "ds_id": "数据集ID",
-  "chart_type": "GROUPED_COLUMN",
-  "pg_id": "页面ID",
-  "row": ["门店名称"],
-  "metric": [
-    {"name": "毛营业额", "aggr": "SUM"},
-    {"name": "成本率"}
-  ],
-  "custom_fields": [
-    {"name": "成本率", "fdType": "DOUBLE", "formula": "SUM([实际使用金额])/SUM([毛营业额])*100"}
-  ],
-  "filters": [{"name": "营业日期", "op": "BT", "value": ["2026-01-01", "2026-02-28"]}]
-}'
-```
-
-**参数格式**：
-
-| 字段 | 必填 | 说明 |
-|------|------|------|
-| `name` | ✅ | 新字段名称 |
-| `fdType` | ✅ | 数据类型：`DOUBLE`（数值）、`STRING`（文本）等 |
-| `formula` | ✅ | 公式表达式，用 `[字段名]` 引用字段，支持 `SUM()`/`AVG()` 等聚合 |
-
-**注意**：
-- 公式里的字段名必须是数据集中已存在的字段
-- 创建后该字段可直接在 `metric`/`row` 中引用（和其他字段一样），如果公式已经聚合无需再写 `aggr`
-- 仅 `create-and-get` 和 `create-card` 支持此参数
-
-
-## 图表类型速查（26种）
-
-| 类型 | metric | row | column | metric_additional | color_by | size_by | 备注 |
-|------|:------:|:---:|:------:|:-----------------:|:--------:|:-------:|------|
-| `SINGLE_VALUE` | 1 | 0 | 0 | 0 | 0 | 0 | 指标卡（单值） |
-| `KPI_CARD` | n | 0 | 0 | 0 | 0 | 0 | 指标卡（带阈值样式） |
-| `BASIC_COLUMN` | 1 | n | 0 | 0 | 0 | 0 | 柱状图 |
-| `GROUPED_COLUMN` | n | n | 1 | 0 | 0 | 0 | 簇状柱状图 |
-| `STACKED_COLUMN` | n | n | 1 | 0 | 0 | 0 | 堆积柱状图 |
-| `PERCENT_STACKED_COLUMN` | n | n | 1 | 0 | 0 | 0 | 百分比堆积柱状图 |
-| `WATERFALL_COLUMN` | 1 | n | 0 | 0 | 0 | 0 | 瀑布图 |
-| `BULLET_COLUMN` | 2 | n | 0 | 0 | 0 | 0 | 子弹图 |
-| `BASIC_BAR` | 1 | n | 0 | 0 | 0 | 0 | 条形图 |
-| `BASIC_LINE` | 1 | n | 0 | 0 | 0 | 0 | 折线图 |
-| `MULTI_LINE` | n | n | 1 | 0 | 0 | 0 | 多条折线图 |
-| `STACKED_AREA` | n | 1 | 1 | 0 | 0 | 0 | 堆积面积图 |
-| `PERCENT_STACKED_AREA` | n | 1 | 1 | 0 | 0 | 0 | 百分比堆积面积图 |
-| `STACKED_COLUMN_WITH_LINE` | n | 1 | 1 | 1 | 0 | 0 | metric=柱子, metric_additional=折线 |
-| `GROUPED_COLUMN_WITH_LINE` | n | 1 | 1 | 1 | 0 | 0 | metric=柱子, metric_additional=折线 |
-| `STACKED_COLUMN_WITH_SYMBOL` | n | 1 | 1 | 1 | 0 | 0 | metric=柱子, metric_additional=标记 |
-| `GROUPED_COLUMN_WITH_SYMBOL` | n | 1 | 1 | 1 | 0 | 0 | metric=柱子, metric_additional=标记 |
-| `PIE` | 1 | 1 | 0 | 0 | 0 | 0 | 饼图 |
-| `TREE_MAP` | 1 | n | 0 | 0 | 0 | 0 | 矩形树图 |
-| `FUNNEL` | n | 0 | 0 | 0 | 0 | 0 | 漏斗图 |
-| `HEAT_MAP` | 1 | 1 | 1 | 0 | 0 | 0 | 热力图 |
-| `MULTIDIMENSIONAL_SANKEY` | 1 | n | 0 | 0 | 0 | 0 | 多维桑基图 |
-| `PIVOT_TABLE` | n | n | n | 0 | 0 | 0 | 交叉表 |
-| `WORD_CLOUD` | 1 | 1 | 0 | 0 | 0 | 0 | 词云 |
-| `BASIC_BUBBLE` | 2 | n | 0 | 0 | 1 | 1 |气泡图 x=metric[0], y=metric[1] |
-| `BASIC_SCATTER_PLOT` | 2 | 1 | 0 | 0 | 1 | 0 | 散点图  x=metric[0], y=metric[1]|
-
-> `n` = 不限数量, `0` = 不支持, `2` = 最大2个
-
-
-## metric 格式
-
-```json
-{"name": "毛营业额", "aggr": "SUM"}                         // SUM
-
-{"name": "订单编码", "aggr": "CNT_DISTINCT", "alias": "订单数"}  // 指定聚合
-
-{"name": "桌单价"}                           // 自定义字段如果在formula的计算公式中已聚合的情况下，就不再需要 aggr了
-```
-
-聚合方式: `SUM` / `AVG` / `MAX` / `MIN` / `CNT` / `CNT_DISTINCT`
-
-## filters 格式
-
-```json
-// 维度筛选（WHERE）
-{"name": "城市", "op": "IN", "value": ["上海市", "南京市"]}
-
-// 日期范围
-{"name": "营业日期", "op": "BT", "value": ["2026-01-01", "2026-02-28"]}
-
-// 度量筛选（HAVING，聚合后过滤）
-{"name": "毛营业额", "op": "GT", "value": ["1000000"]}
-```
-
-## sorting 格式
-
-```json
-// 单字段排序
-[{"name": "毛营业额", "order": "DESC"}]
-[{"name": "门店编号", "order": "ASC"}]
-
-// 多字段排序
-[{"name": "城市", "order": "ASC"}, {"name": "毛营业额", "order": "DESC"}]
-```
-
-## 字段名格式
-
-`row`、`column`、`metric.name`、`filters.name`、`sorting.name`、`color_by.name`、`size_by.name` 都用字段名。
-
-**普通字段** — 直接写平台上的字段名：
-```json
-"row": ["城市"]
-"metric": [{"name": "毛营业额", "aggr": "SUM"}]
-"filters": [{"name": "门店名称", "op": "EQ", "value": ["某门店"]}]
-```
-
-**日期子字段** — `字段名(粒度)`，自动按时间维度拆分：
-
-| 写法 | 效果 | 示例输出 |
-|------|------|----------|
-| `"营业日期(年)"` | 按年汇总 | 2025 |
-| `"营业日期(季度)"` | 按季度汇总 | 2025年第4季度 |
-| `"营业日期(月)"` | 按月汇总 | 2025-11 |
-| `"营业日期(周)"` | 按周汇总 | 2025年第44周 |
-| `"营业日期(星期)"` | 按星期几汇总 | 星期六 |
-
-```json
-"row": ["营业日期(月)"]   // 按月看趋势
-"filters": [{"name": "营业日期(年)", "op": "IN", "value": ["2026"]}]  // 筛选2026年
-```
-
-## filterType 速查
-
-| 类型 | 含义 | 示例 |
-|------|------|------|
-| `EQ` | 等于 | `["A品牌"]` |
-| `NE` | 不等于 | `["闭店"]` |
-| `IN` | 在列表中 | `["上海市","北京市"]` |
-| `NI` | 不在列表中 (Not In) | `["闭店","未开业"]` |
-| `BT` | 范围 | `["2025-01-01","2025-12-31"]` |
-| `GT` | 大于 | `["100"]` |
-| `GE` | 大于等于 | `["100"]` |
-| `LT` | 小于 | `["100"]` |
-| `LE` | 小于等于 | `["100"]` |
-| `CONTAINS` | 包含 | `["万达"]` |
-| `IS_NULL` | 为空 | `[]` |
-| `NOT_NULL` | 不为空 | `[]` |
-
-## 建卡示例
-
-**示例0：汇总值（row 为空） — 拿总计不拆维度**
-```bash
-# row=[] 不分组，直接返回汇总值，不会截断
-$SCRIPT create-and-get '{"name":"汇总","ds_id":"<dataset_id>","chart_type":"BASIC_COLUMN","pg_id":"<page_id>","row":[],"metric":[{"name":"毛营业额","aggr":"SUM"}],"filters":[{"name":"日结日期","op":"BT","value":["2026-03-16","2026-03-22"]}]}'
-# 输出: 毛营业额: 313230258.42
-# 卡片保留供复核，用户要求清理时再 delete-cards
-```
-
-**示例1：指标卡 — 2月消费会员数**
-```bash
-$SCRIPT create-and-get '{"name":"2月消费会员数","ds_id":"<dataset_id>","chart_type":"SINGLE_VALUE","pg_id":"页面ID","metric":[{"name":"会员id","aggr":"CNT_DISTINCT"}],"filters":[{"name":"营业日期","op":"BT","value":["2026-02-01","2026-02-28"]}]}'
-# 输出: 会员id: 252335
-```
-
-**示例2：柱状图 — 各城市毛营业额（按营业额降序）**
-```bash
-$SCRIPT create-and-get '{"name":"各城市毛营业额","ds_id":"<dataset_id>","chart_type":"BASIC_COLUMN","pg_id":"页面ID","row":["城市"],"metric":[{"name":"毛营业额","aggr":"SUM"}],"filters":[{"name":"营业日期","op":"BT","value":["2026-01-01","2026-02-28"]}],"sorting":[{"name":"毛营业额","order":"DESC"}]}'
-# 输出: 毛营业额: ['2323360', '8483271', ...]  维度: ['南京市', '南通市', ...]
-```
-
-**示例3：交叉表 — 各城市×月份营业额（按城市+月份排序）**
-```bash
-$SCRIPT create-and-get '{"name":"城市×月份营业额","ds_id":"<dataset_id>","chart_type":"PIVOT_TABLE","pg_id":"页面ID","row":["城市"],"column":["营业日期(月)"],"metric":[{"name":"毛营业额","aggr":"SUM"}],"filters":[{"name":"营业日期","op":"BT","value":["2025-01-01","2026-02-28"]}],"sorting":[{"name":"城市","order":"ASC"},{"name":"营业日期(月)","order":"ASC"}]}'
-# 输出: [城市 ,月份 ,毛营业额].....['上海','2025-01','123232323'],['上海','2025-02','1230232333'].....
-# 排序: 先按城市名正序，再按月份正序
-```
-
-**示例4：多条折线图 — 各渠道月趋势**
-```bash
-$SCRIPT create-and-get '{"name":"渠道月趋势","ds_id":"<dataset_id>","chart_type":"MULTI_LINE","pg_id":"页面ID","row":["营业日期(月)"],"column":["销售类型名称"],"metric":[{"name":"毛营业额","aggr":"SUM"}],"filters":[{"name":"营业日期","op":"BT","value":["2025-01-01","2026-02-28"]}]}'
-```
-
-**示例5：组合图（柱+线） — 营业额柱状+消费人数折线**
-```bash
-$SCRIPT create-and-get '{"name":"营业额与用餐人数","ds_id":"<dataset_id>","chart_type":"STACKED_COLUMN_WITH_LINE","pg_id":"页面ID","row":["营业日期(月)"],"column":["销售类型名称"],"metric":[{"name":"毛营业额","aggr":"SUM"}],"metric_additional":[{"name":"用餐人数","aggr":"SUM"}],"filters":[{"name":"营业日期","op":"BT","value":["2026-01-01","2026-02-28"]}]}'
-```
-
-**示例6：气泡图 — 各门店营业额vs实收金额（按城市着色，气泡大小=用餐人数）**
-```bash
-$SCRIPT create-and-get '{"name":"门店气泡图","ds_id":"<dataset_id>","chart_type":"BASIC_BUBBLE","pg_id":"页面ID","row":["城市","门店"],"metric":[{"name":"毛营业额","aggr":"SUM"},{"name":"菜品实收金额","aggr":"SUM"}],"size_by":[{"name":"用餐人数","aggr":"SUM"}],"color_by":[{"name":"城市"}],"filters":[{"name":"营业日期","op":"BT","value":["2026-01-01","2026-02-28"]}]}'
-# row=维度标签, metric[0]=x, metric[1]=y, color_by=颜色分组, size_by=气泡大小
-```
-
-## 完整工作流示例
-
-**需求：做一张「2026年2月各城市外卖销售类型毛营业额 TOP10」交叉表**
-
-```bash
-# Step 1: 通过表id查字段，确认可用字段
-$SCRIPT get-columns <dataset_id>
-# → 确认: 城市(DIM), 毛营业额(METRIC), 销售类型名称(DIM), 营业日期(DATE)
-
-# Step 2: 查枚举值（因为用了 IN/EQ 筛选，必须查）
-$SCRIPT search-values <dataset_id> --name "销售类型名称" --search "外卖"
-# → 确认值是 "外卖"
-
-# Step 3: 建交叉表，自动取数
-$SCRIPT create-and-get '{"name":"2月外卖各城市毛营业额","ds_id":"<dataset_id>","chart_type":"PIVOT_TABLE","pg_id":"<page_id>","row":["城市"],"column":["销售类型名称"],"metric":[{"name":"毛营业额","aggr":"SUM"}],"filters":[{"name":"营业日期","op":"BT","value":["2026-02-01","2026-02-28"]},{"name":"销售类型名称","op":"EQ","value":["外卖"]}],"sorting":[{"name":"毛营业额","order":"DESC"}]}'
-```
-
-> 💡 如果只做日期或数值筛选（无分类筛选），跳过 Step 2，两步搞定。
-
-
-
-## guancli 补充命令（只读探索 + 省 token）
-
-guancli 是观远官方 CLI（`npm install -g @guandata/guancli`），与 guandata.py **互补**：
-- **guandata.py** → 建卡、取数、删卡、发布页面（写操作）
-- **guancli** → 搜索、探索、ETL/指标/任务/表单（读操作 + 表单CRUD）
-
-**全局 flag**：
-- `--brief` — 省 token 模式（输出缩减 50%+），探索阶段必用
-- `-f csv` / `-f json` / `-f table` — 切换输出格式
-- `--raw` — 原始 JSON（调试用）
-
-### 数据集探索（替代 list-datasets）
-
-```bash
-# 搜索数据集（比 list-datasets 全量拉取快得多）
-guancli ds search "会员"
-guancli ds search "会员" --brief        # 省 token
-
-# 数据集目录树
-guancli ds tree
-guancli ds tree --brief
-
-# 数据集详情（字段列表 + 元信息）
-guancli ds get <ds_id>
-guancli ds get <ds_id> --brief          # 1894 字符 vs 完整 7468 字符
-
-# 预览数据（自动精简列，干净表格）
-guancli ds preview <ds_id> --limit 10
-guancli ds preview <ds_id> --limit 10 -f csv   # CSV 格式
-```
-
-### ETL 探索（guandata.py 无此能力）
-
-```bash
-# 搜索 ETL
-guancli etl search "会员"
-guancli etl search "会员" --brief
-
-# ETL 目录树
-guancli etl tree
-
-# ETL 详情（节点列表、SQL、血缘）
-guancli etl get <etl_id>
-guancli etl get <etl_id> --brief        # 省略 Malloy/血缘/公式细节
-
-# 预览 ETL 节点数据
-guancli etl preview <etl_id> --node <node_id> --limit 10
-```
-
-### 指标平台（guandata.py 无此能力）
-
-```bash
-# 搜索指标
-guancli metric search "营业额"
-
-# 指标目录树
-guancli metric tree
-
-# 指标详情
-guancli metric get <metric_id>
-
-# 查询指标数据
-guancli metric query <metric_id>
-```
-
-### 指标归因分析（guandata.py 无此能力）
-
-```bash
-# 搜索指标树
-guancli metric_attribution search "营业额"
-
-# 指标树详情
-guancli metric_attribution get <tree_id>
-
-# 查询贡献数据
-guancli metric_attribution query <tree_id>
-```
-
-### 任务监控（guandata.py 无此能力）
-
-```bash
-# 查看运行中任务
-guancli task running
-
-# 任务历史
-guancli task history
-
-# 任务详情
-guancli task get <task_id>
-guancli task detail <task_id>
-```
-
-### 页面 & 卡片探索
-
-```bash
-# 搜索页面（替代 list-pages 全量拉取）
-guancli page search "门店"
-
-# 页面详情（卡片列表 + 布局）
-guancli page get <pg_id>
-guancli page get <pg_id> --brief
-
-# 卡片元信息（数据集、类型、筛选条件）
-guancli card get <card_id>
-
-# 预览卡片数据
-guancli card preview <card_id>
-```
-
-### 表单填报 CRUD
-
-```bash
-# 列出表单
-guancli form list
-guancli form list --tree              # 显示目录结构
-
-# 查看表单字段结构
-guancli form schema <form_id>
-
-# 查询表单数据
-guancli form query <form_id>
-guancli form query <form_id> -f csv   # CSV 格式
-
-# 插入数据
-guancli form add <form_id> '{"字段1":"值1","字段2":"值2"}'
-
-# 更新数据
-guancli form update <form_id> <record_id> '{"字段1":"新值"}'
-
-# 删除数据
-guancli form delete <form_id> <record_id>
-```
-
-### 通用 API 调用（万能兜底）
-
-```bash
-# GET 请求
-guancli fetch GET /api/health
-
-# POST 请求
-guancli fetch POST /api/resource '{"key":"value"}'
-
-# stdin 传大 body
-echo '{"large":"json"}' | guancli fetch POST /api/some-endpoint --stdin
-
-# 上传文件
-guancli fetch POST /api/import/upload-files/CSV --upload file0=/path/to/data.csv
-```
-
-### 工具选择决策表
-
-| 场景 | 用什么 | 原因 |
-|---|---|---|
-| 建卡+取数、数据分析 | `guandata.py create-and-get` | guancli 不支持写操作 |
-| 删卡/发布页面 | `guandata.py delete-cards / release-page` | 同上 |
-| 搜索数据集/页面/ETL | `guancli xx search` | 比全量拉取快，省 token |
-| 查 ETL 结构/SQL/血缘 | `guancli etl get` | guandata.py 无此能力 |
-| 查指标平台 | `guancli metric` | guandata.py 无此能力 |
-| 任务排查 | `guancli task` | guandata.py 无此能力 |
-| 快速预览数据 | `guancli ds preview` | 自动精简列，输出干净 |
-| 表单 CRUD | `guancli form` | guandata.py 无此能力 |
-| 调未封装的 API | `guancli fetch` | 万能兜底 |
+📖 **[references/guancli-commands.md](references/guancli-commands.md)** — 9 大类命令完整速查（ds / etl / metric / metric_attribution / task / page / card / form / fetch）+ 工具选择决策表。
 
 ## 错误处理
 
@@ -829,121 +332,21 @@ guancli fetch POST /api/directory \
 
 ---
 
-## B-4. 第二步：构造 ETL payload
+## B-4. 第二步：构造 ETL payload（速查）
 
-### B-4.1 反推 schema
-
-```bash
-guancli --raw etl get <旧ETL_id> > old.json
-jq '.data.actions[] | {id,name,type,sources,inputDsId,outputDsName,parentDirId,sql,dataSource,relativeFieldAlias}' old.json
-```
-
-### B-4.2 最小骨架：3 节点
+最小骨架 = 3 节点：
 
 ```text
 INPUT_DATASET → SQL_SCRIPT → OUTPUT_DATASET
 ```
 
-### B-4.3 完整 payload 模板
+**最关键的字段坑**（详细见 references）：
+- ⚠️ SQL 节点字段名是 **`sql`，不是 `sqlScript`**。写错时 direct-save 不报错，但 SQL 不生效（最隐蔽 bug）。
+- ⚠️ SQL 里 `input1/input2/...` 是**位置式索引**对应 `sources[]`，删除 INPUT 节点会让索引前移，**改 input 节点必须同时改 SQL**。
+- ⚠️ INPUT_DATASET 的 `relativeFieldAlias` 决定 SQL 里能引用什么字段名，必须读了再写 SQL。
+- ⚠️ OUTPUT_DATASET 的 `parentDirId` 是**数据集目录 id**，不是 ETL 目录 id（错填→"保存路径无效"）。
 
-```json
-{
-  "name": "dim_store_master_v2",
-  "parentDirId": "<etl_dir_id>",
-  "actions": [
-    {
-      "id": "id_1778227328970_1",
-      "name": "input_source",
-      "type": "INPUT_DATASET",
-      "sources": [],
-      "inputDsId": "<source_ds_id>"
-    },
-    {
-      "id": "id_1778227328970_2",
-      "name": "transform",
-      "type": "SQL_SCRIPT",
-      "sources": ["id_1778227328970_1"],
-      "sql": "SELECT DISTINCT\n  `store_code` AS `store_id`,\n  `store_name` AS `store_name`\nFROM input1\nWHERE `store_code` IS NOT NULL;"
-    },
-    {
-      "id": "id_1778227328970_3",
-      "name": "dim_store_master_v2",
-      "type": "OUTPUT_DATASET",
-      "sources": ["id_1778227328970_2"],
-      "outputDsName": "dim_store_master_v2",
-      "parentDirId": "<ds_dir_id>",
-      "dataSource": {
-        "created": false,
-        "name": "dim_store_master_v2",
-        "parentDirName": "warehouse_v2",
-        "parentDirId": "<ds_dir_id>",
-        "dirPath": [
-          { "dirId": "<root_dir_id>", "dirName": "Root" },
-          { "dirId": "<parent_ds_dir_id>", "dirName": "ParentDB" },
-          { "dirId": "<ds_dir_id>", "dirName": "warehouse_v2" }
-        ]
-      }
-    }
-  ]
-}
-```
-
-### B-4.4 节点字段速查（含踩坑标注）
-
-| 字段 | INPUT_DATASET | SQL_SCRIPT | OUTPUT_DATASET |
-|---|---|---|---|
-| `id` | 必填 | 必填 | 必填 |
-| `type` | `"INPUT_DATASET"` | `"SQL_SCRIPT"` | `"OUTPUT_DATASET"` |
-| `sources` | `[]` | 上游节点 id 数组 | 上游节点 id 数组 |
-| `inputDsId` | **必填** | null | null |
-| `sql` | null | **必填**，字段名是 `sql` ⚠️ **不是 `sqlScript`** | null |
-| `outputDsName` | null | null | **必填** |
-| `parentDirId` | null | null | **数据集目录 id** |
-| `dataSource` | null | null | 必填，含 dirPath、parentDirId |
-| `relativeFieldAlias` | **关键**：fieldHash → 字段名映射 | null | null |
-| `displayType` | DATAFLOW / CLICKHOUSE / MYSQL / FEISHU_SPREADSHEET | null | DATAFLOW |
-| `cascadeUpdateEnabled` | true/false | null | null |
-
-⚠️ **`sql` vs `sqlScript` 字段名最大坑**：写错时 direct-save 不报错（接受任意字段），但 SQL 不生效——BI 落库后看到的还是老 SQL。这个 bug 极隐蔽，必须用正确字段名 `sql`。
-
-### B-4.5 SQL 节点的位置式 input 索引（必须警惕）
-
-```text
-SQL 里 input1 = sources[0] 对应的 INPUT_DATASET
-SQL 里 input2 = sources[1] 对应的 INPUT_DATASET
-... (位置式索引，不是按 ID)
-```
-
-**关键陷阱**：删除某个 INPUT_DATASET 节点（去循环依赖时常见），其余 input 索引会**自动往前补**：原 input3 变成 input2，原 input5 变成 input3。**改 input 节点必须同时改 SQL！**
-
-### B-4.6 已知支持的节点类型
-
-```text
-INPUT_DATASET     上游输入
-SQL_SCRIPT        Spark SQL（推荐）
-OUTPUT_DATASET    输出数据集
-FILTER_ROWS       行筛选（看 .filterConditions）
-JOIN_DATA         多表 join（看 .dataFusion）
-GROUP_BY          分组聚合（看 .zoneData.metric）
-CALCULATOR        计算字段（看 .formulas[].expr）
-SELECT_COLUMNS    选列
-APPEND_ROWS       纵向合并 / UNION
-```
-
-**实战推荐**：把所有非 SQL 节点全部编译成单条 SQL_SCRIPT，三节点结构最简单可控。
-
-### B-4.7 dataFlowId 控制 create vs update
-
-```bash
-# 新建：payload 顶层不带 dataFlowId
-guancli fetch POST /api/etl/direct-save --stdin < payload.json
-# => {"result":"ok","response":{"success":true,"dataFlowId":"<new_id>"}}
-
-# 更新：payload 顶层加 "dataFlowId":"<existing_id>"
-guancli fetch POST /api/etl/direct-save --stdin < payload-updated.json
-```
-
-create 和 update 是**同一个接口**。SQL 改错直接改 payload 加 `dataFlowId` 再 POST，**不要**删了重建。
+📖 **[references/part-b-payload.md](references/part-b-payload.md)** — 完整 payload 模板（含 dataSource.dirPath）+ 三种节点的字段速查表 + 9 种已知节点类型 + dataFlowId 控制 create vs update + **B-8 复用模板：从扫描到落表的完整 4 阶段脚本**（治理扫描 → 建目录 → 写入执行 → 删除旧链）。
 
 ---
 
@@ -978,7 +381,7 @@ taskId=$(guancli fetch POST /api/etl/execute "{\"dataFlowId\":\"$DFID\"}" \
 sleep 4
 guancli fetch GET "/api/task/$taskId" | jq '.response.result.error'
 
-# Step 3：根据 error 类型对照 B-9 修复手册
+# Step 3：根据 error 类型对照 references/part-b-errors.md 修复手册
 ```
 
 ### B-5.4 异步轮询写法
@@ -1079,214 +482,22 @@ DELETE /api/data-source/<id>
 
 ---
 
-## B-8. 复用模板：从扫描到落表
-
-```bash
-# === 阶段一：治理扫描 ===
-PARENT_DIR="<父ETL目录id>"
-guancli etl search '' -d $PARENT_DIR --raw > etl-list.json
-
-mkdir -p raw
-jq -r '.response.contents[].dataFlowId' etl-list.json | while read id; do
-  guancli --raw etl get $id > raw/$id.json
-done
-
-node analyze.mjs raw/ > analysis.json
-# 人工 review → migration-plan.json
-
-# === 阶段二：建目录 ===
-NEW_DIR_NAME="warehouse_v2"
-PARENT_ETL_DIR="<父ETL目录id>"
-PARENT_DS_DIR="<父数据集目录id>"
-
-ETL_DIR=$(guancli fetch POST /api/directory \
-  "{\"name\":\"$NEW_DIR_NAME\",\"parentDirId\":\"$PARENT_ETL_DIR\",\"dirType\":\"ETL\"}" \
-  | jq -r '.response.dirId')
-
-DS_DIR=$(guancli fetch POST /api/directory \
-  "{\"name\":\"$NEW_DIR_NAME\",\"parentDirId\":\"$PARENT_DS_DIR\",\"dirType\":\"DATA_SET\"}" \
-  | jq -r '.response.dirId')
-
-# === 阶段三：写入 + 执行（每张 v2 表循环） ===
-TARGET_NAME="<输出表名>"
-DFID=$(guancli fetch POST /api/etl/direct-save --stdin < payload.json \
-  | jq -r '.response.dataFlowId')
-
-# 节点预览（成功再 execute）
-NODE_OUT=$(guancli etl get $DFID --raw \
-  | jq -r '.data.actions[] | select(.type=="OUTPUT_DATASET") | .id')
-guancli etl preview $DFID $NODE_OUT --limit 5 --timeout 120
-
-TASK=$(guancli fetch POST /api/etl/execute "{\"dataFlowId\":\"$DFID\"}" \
-  | jq -r '.response.taskId')
-
-until [ "$(guancli task get $TASK --raw | jq -r '.response.status')" != "RUNNING" ]; do
-  sleep 10
-done
-
-# 失败定位
-guancli fetch GET "/api/task/$TASK" | jq '.response.result.error'
-
-# 成功验证
-guancli ds search $TARGET_NAME --raw \
-  | jq '.response.contents[0] | {dsId,name,rowCount,colCount}'
-
-# === 阶段四：删除旧链路（确认 v2 对账无误后） ===
-guancli fetch DELETE /api/data-source/<v1_dsId>
-guancli fetch DELETE /api/etl/<v1_etlId>
-```
-
----
-
-## B-9. 报错修复手册（10 类真坑）
-
-### 坑 1：`请输入ETL名称` / `保存路径无效`
-
-```bash
-$ printf '{}' | guancli fetch POST /api/etl/direct-save --stdin
-=> 请输入ETL名称
-$ printf '{"name":"x","actions":[]}' | guancli fetch POST /api/etl/direct-save --stdin
-=> 保存路径无效
-```
-
-**根因**：顶层 `parentDirId` 缺失或填错（必须是 `dirType=ETL` 那棵树的 id）。
-
-**修复**：先建好 ETL 目录拿到 id，写到 payload 顶层。
-
----
-
-### 坑 2：保存成功但 execute 数据为空（上游运行权限不足）
-
-**现象**：写入返回 `{success:true}`，execute 也返回 ok，但输出表始终为空。
-
-**根因**：`INPUT_DATASET.inputDsId` 当前账号只有"读权限"没有"运行权限"。
-
-**修复**：
-1. 换一个账号确实能运行的输入表
-2. 写自包含 ETL：`SELECT explode(sequence(...))` 或 `VALUES(...)` 直接生成数据
-
----
-
-### 坑 3：上游字段名带隐藏 `\n`（含升级版）
-
-**现象**：列名显示成两行，但 SQL 引用永远查不到。
-
-**修复（基础版）**：编译 SQL 时 `` `带换行的原字段名` AS `干净别名` ``，下游用别名。
-
-**升级版坑**：v2 SQL 里字段名实际是 `` `field\n  ` ``（换行 + 2 空格），但 fieldAlias 是 `` `field\n` ``（仅换行）——**两边不一致**。BI 老引擎容错跑得通，重生节点 ID 后挂了。
-
-**修复**：把 SQL 里 `` `field\n  ` `` 改成 `` `field\n` `` 对齐 fieldAlias。
-
----
-
-### 坑 4：`<> NULL` 把所有行过滤光
-
-**现象**：旧"非空筛选"节点编译成 `WHERE field <> NULL`，输出 0 行。
-
-**根因**：SQL 标准里 `<> NULL` 永远是 `unknown`。
-
-**修复**：编译器 `FILTER_ROWS` → SQL 强制规则：
-- "非空" → `IS NOT NULL`
-- "为空" → `IS NULL`
-
----
-
-### 坑 5：字段引用与 relativeFieldAlias 错位
-
-**现象**：SQL 引用 `t.id`，但 INPUT_DATASET 在 `relativeFieldAlias` 里映射成了 `coupon_id`。`cannot resolve column`。
-
-**修复**：编译 payload 时**必须读 INPUT_DATASET 的 `relativeFieldAlias`**，把 SQL 里所有原字段名替换成节点级别名。
-
----
-
-### 坑 6：CTE 内 `;` + 中文注释
-
-**现象**：
-
-```text
-[PARSE_SYNTAX_ERROR] Syntax error at or near ';'.(line 196, pos 24)
-== SQL ==
-... FROM n_id_xxx;  -- 请将这里替换为您的源数据表名 ...
-```
-
-**修复**：
-
-```js
-fixed = sql.replace(/(\s+FROM\s+n_id_\w+);(\s*--[^\n]*)?/g, "$1");
-fixed = fixed.replace(/;\s*--[^\n]*/g, "");
-```
-
----
-
-### 坑 7：FROM/JOIN 同表别名同名
-
-**现象**：
-
-```sql
-FROM n_id_aaa s1
-  LEFT JOIN n_id_aaa s1 ON s2.`field_a` = s1.`field_a`
--- 错误: AMBIGUOUS_REFERENCE Reference s1.`field_a` is ambiguous
-```
-
-**修复**：把 FROM 别名改成 s2，对齐 ON 子句：
-
-```sql
-FROM n_id_bbb s2
-LEFT JOIN n_id_aaa s1 ON s2.`field_a` = s1.`field_a`
-```
-
----
-
-### 坑 8：FROM 表错位（自连而非 JOIN 不同表）
-
-**现象**：
-
-```sql
-FROM n_id_aaa s1
-  LEFT JOIN n_id_aaa s1 ON s2.`key` = s1.`key`
--- 错误: s2.`some_field` 找不到
-```
-
-但 SELECT 用 `s2.specific_field` —— 说明 v2 SQL 写错表。
-
-**修复**：
-
-```sql
-FROM n_id_aaa s1
-LEFT JOIN n_id_ccc s2 ON s2.`key` = s1.`key`
-```
-
----
-
-### 坑 9：UNION 列数不匹配
-
-**现象**：
-
-```text
-[NUM_COLUMNS_MISMATCH] UNION can only be performed on inputs with the same number of columns,
-but the first input has 35 columns and the second input has 36 columns.
-```
-
-**根因**：BI 老引擎对 UNION 列差异自动补 NULL，重生节点 ID 后严格化。
-
-**修复（彻底）**：手工把两侧 SELECT 列表对齐，缺的字段用 `NULL AS xxx` 补。
-
----
-
-### 坑 10：日期字段 vs 字符串字面量混淆
-
-**现象**：
-
-```sql
-SELECT *, current_date() AS `today_field` FROM ...
-WHERE `order_date` < 'today_field'   -- ❌ 字符串字面量，恒为 false
-```
-
-**修复**：
-
-```sql
-WHERE `order_date` = date_sub(current_date(), 1)
-```
+## B-9. 报错修复手册（10 类真坑 · 速查）
+
+每条只列**触发现象 + 一句根因 + 一句修复方向**；完整修复方案 + SQL 示例 + 升级版坑见 **[references/part-b-errors.md](references/part-b-errors.md)**。
+
+| 坑号 | 触发现象 | 根因 / 修复方向 |
+|---|---|---|
+| **1** | `请输入ETL名称` / `保存路径无效` | 顶层 `parentDirId` 缺失或填错 → 必须是 `dirType=ETL` 那棵树的 id |
+| **2** | 保存成功但 execute 数据为空 | 上游 `inputDsId` 只有读权限没运行权限 → 换有权限的输入或写自包含 ETL |
+| **3** | 列名带隐藏 `\n` 找不到字段 | SQL 里要 `` `带换行的原字段名` AS `干净别名` ``；升级版坑：fieldAlias 与 SQL 中换行+空格不一致 |
+| **4** | `WHERE field <> NULL` 输出 0 行 | SQL 标准里 `<> NULL` 永远是 unknown → 必须 `IS NOT NULL` / `IS NULL` |
+| **5** | `cannot resolve column` | 字段引用与 INPUT_DATASET 的 `relativeFieldAlias` 错位 → 编译时按节点级别名替换 |
+| **6** | `Syntax error at or near ';'` | CTE 内 trailing `;` + 中文注释 → 用 regex 去除 `FROM n_id_xxx;` 后的 `;` 与注释 |
+| **7** | `AMBIGUOUS_REFERENCE` | FROM/JOIN 同表别名同名 → 改 FROM 别名为 s2，对齐 ON 子句 |
+| **8** | `s2.xxx 找不到` | FROM 表错位（自连而非 JOIN 不同表） → 修正 JOIN 目标表 |
+| **9** | `NUM_COLUMNS_MISMATCH` | UNION 列数不一致（老引擎自动补 NULL，新引擎严格化） → 手工对齐 SELECT，缺的用 `NULL AS xxx` |
+| **10** | 日期比较恒为 false | `WHERE order_date < 'today_field'` 字符串字面量 → 改 `date_sub(current_date(), 1)` |
 
 ---
 
@@ -1331,69 +542,19 @@ done
 
 ---
 
-## B-11. v2 → v3 批量改造 SDK
+## B-11. v2 → v3 批量改造 SDK（速查）
 
-### B-11.1 SDK 核心 API
-
-```js
-// v3_sdk.mjs
-export function transformV2ToV3({
-  v2PayloadFile,    // 旧 payload 路径
-  v3Name,           // 新 ETL 名
-  removeInputs = [],// 要移除的 INPUT_DATASET id（去循环依赖）
-  newSql = null,    // 重写 SQL（null = 沿用原 SQL）
-  inputMap = {},    // v1/v2 dsId → v3 dsId 替换
-  description = "",
-}) { ... }
-
-export function pushAndExecute(v3Name, payloadPath) {
-  // POST /api/etl/direct-save → POST /api/etl/execute
-}
-
-export function checkStatus(v3Name) {
-  // guancli etl search → parse Status
-}
-```
-
-### B-11.2 transformV2ToV3 内部 7 步
-
-```text
-1. 读 v2 payload JSON
-2. 过滤掉 removeInputs 列表中的 INPUT_DATASET 节点
-3. 替换 inputMap 中的 inputDsId（v1/v2 → v3）
-4. 重新生成所有节点 ID（避免冲突），同步重映射 sources 数组
-5. 改 OUTPUT_DATASET 的 outputDsName + parentDirId
-6. 如有 newSql，覆盖 SQL_SCRIPT 节点的 `sql` 字段
-7. 顶层换 name + parentDirId + dirPath + description
-   + 更新 meta = JSON.stringify(actions)
-```
-
-### B-11.3 关键陷阱（必读）
-
-```text
-- SQL 字段名是 `sql`，不是 `sqlScript`！（最大坑）
-- 重排节点 ID 时 sources 数组要同步映射
-- 删除 INPUT_DATASET 后剩余 input 索引重排（input1..N），SQL 可能要同步改
-- meta 字段也要更新（meta = JSON.stringify(actions)）
-- description 改了不影响行为，但便于追溯
-```
-
-### B-11.4 时间窗口缩减实战
-
-v2 是近 3 个月窗口（千万级），v3 改昨日窗口（验证沙盒）：
+`v3_sdk.mjs` 三个核心 API：
 
 ```js
-let sql = v2_sql.replace(
-  /add_months\(concat\(substr\(current_date\(\)\s*,1,7\),'-01'\),-3\)/g,
-  "date_sub(current_date(), 1)",
-);
-sql = sql.replace(
-  /WHERE\s+`order_date`\s*<\s*'today'/g,
-  "WHERE `order_date` = date_sub(current_date(), 1)",
-);
+transformV2ToV3({ v2PayloadFile, v3Name, removeInputs, newSql, inputMap, description })
+pushAndExecute(v3Name, payloadPath)   // direct-save → execute
+checkStatus(v3Name)                    // guancli etl search → parse Status
 ```
 
-**结果**：v3 跑出 ~50 万行（与业务预期 60 万级别误差 8%）。
+`transformV2ToV3` 内部 7 步关键陷阱：**SQL 字段名是 `sql` 不是 `sqlScript`**（最大坑） · 重排节点 ID 时 sources 数组要同步 · 删除 INPUT 后 input 索引重排 · meta 字段要同步更新。
+
+📖 **[references/part-b-sdk.md](references/part-b-sdk.md)** — 完整 7 步实现 + 时间窗口缩减实战（v2 近 3 月 → v3 昨日窗口的 regex 替换样板）。
 
 ---
 
@@ -1410,7 +571,7 @@ sql = sql.replace(
 9. **批量任务异步监控**：`until` 循环 + `etl search | grep -c PROCESSING` 比单 task 轮询效率高。
 10. **新旧并行**：v2 链路与 v1 并行，对账无误后再下线 v1。
 
-> 💡 **30+ 张表跨多日的工程必须走 ExecPlan**：不要靠零散 todo + 群消息 + 临时 markdown 来追踪进度。直接走 **B-17.11** 的 ExecPlan 工作法——四个活文档章节（Progress / Surprises & Discoveries / Decision Log / Outcomes & Retrospective）能把治理判断、循环依赖拆法、字段隐藏换行这类"踩坑—修复"轨迹完整落到一份自包含文档里，下一个接手的人不用问任何上下文就能继续。
+> 💡 **30+ 张表跨多日的工程必须走 ExecPlan**：不要靠零散 todo + 群消息 + 临时 markdown 来追踪进度。直接走 **B-17.11**（在 [references/part-b17-fullchain-rewrite.md](references/part-b17-fullchain-rewrite.md)）的 ExecPlan 工作法——四个活文档章节（Progress / Surprises & Discoveries / Decision Log / Outcomes & Retrospective）能把治理判断、循环依赖拆法、字段隐藏换行这类"踩坑—修复"轨迹完整落到一份自包含文档里，下一个接手的人不用问任何上下文就能继续。
 
 ---
 
@@ -1480,323 +641,18 @@ guancli fetch GET /api/directory/DATA_SET/authorized-tree | jq '.response | .. |
 
 ---
 
-## B-16. 触发场景示例
-
-**治理类：**
-- "帮我扫一遍我们 BI 的 ETL，看哪些可以删 / 合并 / 重建"
-- "ETL 之间有没有循环依赖"
-- "这些字段还在被使用吗"
-- "怎么判断一个 ETL 应该归哪一层"
-- "我们 BI 的字段冗余情况怎么样"
-
-**写入类：**
-- "帮我在观远 BI 上新建一个 ETL"
-- "我有一份 SQL，想做成 ETL 跑出来"
-- "guancli 怎么 POST /api/etl/direct-save"
-- "Guandata 怎么批量重建 ETL"
-- "观远 BI 新建目录的 API 是什么"
-
-**报错类：**
-- "direct-save 报错 保存路径无效 / 请输入ETL名称"
-- "ETL 保存了但 execute 没数据 / 输出 0 行"
-- "ETL 字段引用报 cannot resolve column"
-- "task FAILED 怎么看真实错误"
-- "ETL 删除失败 输出数据集已存在"
-- "UNION columns mismatch 怎么修"
-- "Spark SQL syntax error at ;"
-
----
-
 ## B-17. 全链路重写方法论（CTO 张进）
 
 > 这套是观远 CTO 张进的 SmartETL 完整改写经验。它跟 B-2 治理扫描互补：B-2 解决"有哪些 ETL 该治理"，B-17 解决"具体重写一条链路时怎么做才不留尾巴"。
 >
 > **核心区别**：B-17 强调**全链路追到原始源**，不接受只重写最终 ADS。如果用户说"把这条链路重新做一遍" / "替换数据源" / "做副本页验收"，必走 B-17。
 
-### B-17.1 何时用 B-17
-
-- 用户明确要把已有 SmartETL **完整**改写成 SQL 版 SmartETL
-- 目标不仅是重建数据集，还包括**页面副本替换**和**卡片级验收**
-- 需要把旧 ETL 当作只读参考，重新梳理页面、数据集、ETL DAG、源数据
-- 需要判断差异到底来自页面配置、执行快照时点、还是某一层数据链
-- 需要处理"上游空快照，但链路定义仍要重写完"的场景
-
-如果用户只是新建一个 SQL 节点数据集，不涉及旧链迁移、页面替换和链路审计 → 走 B-3 ~ B-9，不用 B-17。
-
-### B-17.2 4 件交付（缺一不可）
-
-交付不是"SQL 能跑"这么简单，必须同时满足：
-
-1. 旧链所有参与本次范围的 ETL 加工都被新 SQL 链替代
-2. 新链只依赖原始表/表单/文件/系统内置表或本轮新 SQL 中间层，**不再依赖旧 ETL 数据集**
-3. 新数据集能挂到页面副本上，且**卡片结果可与原页比对**
-4. 对无法验收的部分，必须把阻塞点上推到真正的空源或权限/平台问题，**不能含糊写成"已完成"**
-
-### B-17.3 8 条硬规则
-
-- ✅ **全链路重写**：不能只改最终 ADS，必须继续上追，直到原始源
-- ✅ **旧资产只读**：旧文档、旧 ETL、旧数据集只作为参考，不作为本轮交付对象
-- ✅ **新结果放新目录**：用子目录隔离新旧对象，正式对象名保持业务原名
-- ✅ **新 SmartETL 只允许 SQL 节点**：不要混回可视化清洗节点（FILTER_ROWS、JOIN_DATA、CALCULATOR 等）
-- ✅ **SQL 输入只引用 input1/input2**：不要赌平台按对象名解析。引用顺序对应 `sources[]` 数组顺序
-- ✅ **双层验收**：结构验收（字段、行列规模、依赖关系、是否 FINISHED）+ 数值验收（与原数据集或页面卡片对齐）
-- ✅ **空快照不是"完成"**：原始源为空时只能写"新链已重写完成，但数值验收硬阻塞"
-- ✅ **页面验收只看副本页**：不直接改原页
-
-### B-17.4 标准工作流（5 步）
-
-#### Step 1. 锁定范围和命名
-
-明确：
-- 正式页面、正式数据集、排除范围
-- 本轮新 ETL 目录和新数据集目录
-- 建 ExecPlan，写清：正式范围 / 只读历史 / 命名规则 / 暂停条件 / 验收标准
-
-#### Step 2. 从页面往下重新拉血缘
-
-**不要从 ETL 往上推**。从页面卡片清单重新盘点：
-- 卡片绑定的数据集
-- selector / 参数卡
-- 页面默认筛选器
-- 页面运行时 payload
-
-对每个正式数据集，拉数据集详情和 ETL DAG。标注每个输入是：
-- 原始源
-- 旧 ETL 数据集
-- 系统表
-- 当前页面不在范围内的旁路输入
-
-#### Step 3. 严格判断"是否已经到原始源"
-
-判断口径很严格：
-
-- ✅ 表单、Excel、ADLS、数据库物理表、系统内置时间表 → **可以视为源**
-- ❌ 输入是 `DATAFLOW` 且背后还有 ETL → **没到底，必须继续追**
-- ❌ 不要因为名字叫 `清洗_*`、`ods_*`、`report_*` 就误判成源
-
-#### Step 4. 重建顺序：上游先，下游后
-
-按"最上游老 ETL 先重写，再往下游收口"推进：
-
-```text
-1. 先重写被多个下游复用的清洗层 / 中间层
-2. 再重写共享中间 ADS
-3. 最后重跑最终消费 ADS
-4. 最后再做页面副本切换
-```
-
-避免反复改下游输入。
-
-#### Step 5. 每个对象的重建模板
-
-每个待重建对象固定记录：
-
-- 原 ETL 定义文件
-- 目标输出 selector
-- 目标输出名称
-- 结构对齐参考的 schema 数据集
-- 需要替换成"本轮新数据集"的输入 override
-
-**自动从 ETL JSON 编译 SQL 时的特殊坑**：
-- `split(col, ']')[1]` 这类**数组下标不能误识别成字段引用**
-- 分组维度重名时要去重
-- 空公式列表不能生成非法 `select`
-- 列名里如果带**换行或特殊字符**，最终 SQL 拼接不能破坏原标识符
-
-### B-17.5 三层验收方法
-
-#### 数据集验收
-
-每新建一层至少检查：
-- 新 ETL 是否 `FINISHED`
-- 新数据集是否**真实物化**（不是只保存了草稿 ETL）
-- 行数、列数是否与旧对象一致
-- 关键字段名是否一致
-
-**结构不一致先修这一层，不要急着看页面。**
-
-结构一致但页面不一致，优先检查：
-- 上下游执行时点
-- 页面筛选是否真正作用到卡片
-- selector 是否还绑定旧 ds
-
-#### 副本页验收
-
-**只换副本页**，原页保持不动。副本页先替换图表卡，再检查 selector 卡。
-
-⚠️ **不要默认相信页面首屏渲染**——副本页常出现两类假差异：
-- selector 还挂旧数据集
-- 页面默认时间筛选器没真正传到卡片
-
-#### 卡片级验收法（推荐）
-
-```text
-1. 先抓原页运行时 payload
-2. 把副本卡切到新数据集
-3. 用原页真实 payload 去重放副本卡片
-4. 这样可以把"页面联动问题"和"数据链问题"拆开
-```
-
-### B-17.6 差异追踪 5 步法
-
-当页面只剩 1~2 张卡不一致时，**不要盲改 SQL**，按下面顺序压缩范围：
-
-```text
-1. 先对比新旧最终数据集的键集合
-2. 再对比有差异的字段（不要一次看全表）
-3. 把差异收缩到少量记录
-4. 沿链路往上追，看差异最早出现在哪一层
-5. 对该层再看：
-   - SQL 定义是否不同
-   - 执行时间是否落后于上游
-```
-
-**关键经验**：很多"SQL 错了"的假象，实际是因为新链吃到了**更早的快照**。如果定义相同但时点落后，先补跑最近一层上游，再补跑下游。
-
-### B-17.7 空快照处理（不能写"已完成"）
-
-如果上游是空的：
-
-```text
-1. 继续把链路定义完整重写到源头
-2. 如平台允许，物化出新的空数据集
-3. 在文档里明确写：
-   - 根阻塞源是谁
-   - 当前行列规模是多少
-   - 哪些下游因此为空
-4. 结论只能写成：
-   "全链路 SQL 重写完成"
-   "数值验收硬阻塞"
-
-❌ 不能写成"已完成对齐"
-```
-
-### B-17.8 标准交付物清单
-
-```text
-output/<restart_tag>/
-  ExecPlan.md              ← 范围、命名、暂停条件、验收标准
-  modeling.md              ← 每个对象的建模决策、依赖关系、字段对齐
-  evidence.md              ← 验收证据：行列数、键集合差异、卡片对比
-  sql/<object_name>/       ← 每个对象的完整 SQL（可独立复跑）
-  raw/                     ← ETL 保存前定义、执行结果、页面运行时 payload
-```
-
-### B-17.9 B-17 特有的常见坑
-
-| 坑 | 表现 | 修复 |
-|---|---|---|
-| 把旧 `DATAFLOW` 当源头 | 只重写了半条链 | 严格按 B-17.3 判断"是否到原始源" |
-| 只保存 ETL 没执行 | 误以为已经有新数据集 | 检查数据集是否物化、状态是否 FINISHED |
-| 卡换了新 ds，selector 还在用旧 ds | 副本页假差异 | 卡片 + selector **都要换** |
-| 时间筛选器没真正生效 | 直接拿页面数字做结论 | 抓原页 runtime payload 重放 |
-| 看到少量差异就修 SQL | 没先检查执行时点 | 走 B-17.6 五步压缩 |
-| 上游空快照时为了"有东西看"接受降级结果 | 文档写成"已完成对齐" | 必须按 B-17.7 写"硬阻塞" |
-
-### B-17.10 完成标准（同时满足才能说"替换成功"）
-
-- [x] 新链已追到原始源，不再依赖旧 ETL 数据集
-- [x] 新 SmartETL 全部是 SQL 节点
-- [x] 目标数据集已**真实物化**并运行成功
-- [x] 页面副本已切到新数据集
-- [x] 非阻塞范围内，**卡片级**结果与原页一致
-- [x] 阻塞范围内，根因已被定位到真实空源或平台限制，**并明确留证**
-
-### B-17.11 用 ExecPlan 管理重写工程（V1.2 新增）
-
-> 借自 OpenAI Codex 的 ExecPlan 规范（[references/execplan-spec.md](references/execplan-spec.md)）。这套方法论的精髓：**让一个完全没上下文的新人，仅凭 ExecPlan 文档本身就能端到端继续这项重写工作。** SmartETL 全链路重写动辄跨多日、跨几十张表、涉及循环依赖拆解和副本页验收，正是 ExecPlan 的最佳适用场景。
-
-**何时启用**：当本次重写工作满足以下任一条件，就开 ExecPlan：
-
-- 涉及 5 张以上 ETL 重建
-- 跨工作日（不能一次性收口）
-- 包含循环依赖拆解（一动牵动多张表）
-- 需要副本页 + 卡片级验收
-- 上游存在空快照需要写明硬阻塞
-
-**核心约束**（来自 ExecPlan 规范，照抄）：
-
-- **自包含**：ExecPlan 不依赖任何外部上下文。读者只有当前工作树和这份文档。
-- **活文档**：每个停顿点都要更新 Progress / Surprises / Decision Log，**不是事后补**。
-- **可观察结果锚定**：验收标准写"卡片 X 在副本页用原 payload 重放，上海 2 月营业额与原页一致到分"，不写"代码层面满足某个定义"。这条跟 B-17.7"空快照不能写已完成对齐"是同一个原则的两种表达。
-
-**SmartETL 改写专用 ExecPlan 骨架**（拿去直接填空，不用从通用模板自己映射）：
-
-```text
-# SmartETL 全链路重写 · <项目代号>
-
-本 ExecPlan 按 references/execplan-spec.md 维护，必须保持 Progress /
-Surprises & Discoveries / Decision Log / Outcomes & Retrospective 始终为最新。
-
-## Purpose / Big Picture
-
-这次重写完成后，<业务方> 在 <副本页 URL> 上看到的 <卡片清单> 全部由
-新 SQL 链 v2 数据集驱动，不再依赖任何旧 ETL；<指定卡片> 与原页数值
-一致，差异 < 1%；<空快照阻塞表> 已明确根因留证。
-
-## 范围 / 命名 / 验收（B-17.1 锁定项）
-
-- 正式范围：<页面 ID> · 数据集 N 个 · ETL N 个
-- 旧资产只读：<旧目录路径>，绝不修改
-- v2 落地：ETL 目录 <NEW_ETL_DIR_ID> · 数据集目录 <NEW_DS_DIR_ID>
-- 命名：dwd_xxx_v2 / dws_xxx_v2 / dim_xxx_v2，业务原名挂在 description
-- 暂停条件：上游空快照 / 平台限制 / 副本页卡片 > 3 张数值偏差
-- 验收：B-17.10 六项必须全勾
-
-## Progress
-
-- [ ] (待时间戳) 治理扫描完成（依赖图 / 循环组 / 复杂度 → analysis.json）
-- [ ] (待时间戳) 第一批 5 张 ETL 写入 + 节点预览通过
-- [ ] (待时间戳) 第一批 execute 落表 + ds preview 验数
-- [ ] (待时间戳) 副本页卡片切换 + payload 重放对账
-- [ ] ...（每张表、每次预览、每次 execute、每张卡片对账都拆条目）
-
-## Surprises & Discoveries
-
-- Observation: <字段名带隐藏换行 / <> NULL 把行过滤光 / SQL 字段名是 sql 不是 sqlScript / ...>
-  Evidence: <task error 摘录 / preview 0 行截图 / payload 片段>
-
-## Decision Log
-
-- Decision: 把"门店信息—马甲"降回纯 DIM，经营状态字段迁到 dws_store_operating_status
-  Rationale: 该表处于 5 张表循环依赖中心，不拆循环就一直反向依赖订单明细
-  Date/Author: 2026-XX-XX / <你>
-
-## Plan of Work
-
-按 B-17.4 的 5 步推进：锁范围 → 拉血缘 → 判断到原始源 → 重建顺序（上游先）
-→ 每对象重建模板。先写最上游清洗层 v2，再共享中间 ADS，再最终消费 ADS，
-最后副本页切换。
-
-## Concrete Steps
-
-每张表的具体命令、payload 路径、dataFlowId、taskId、节点 OUTPUT id（带 _out 后缀）
-落到这里，方便接手人原样复跑。
-
-## Validation and Acceptance
-
-- 数据集层：guancli ds get <dsId> --brief 看行列数与旧对象差异 < 1%
-- 卡片层：抓原页 runtime payload，副本卡切新 ds 重放，<指定卡片> 数值一致
-- 空快照层：明确写"全链路 SQL 重写完成，<根阻塞源> 数值验收硬阻塞"
-
-## Outcomes & Retrospective
-
-每完成一个里程碑写一段：完成什么 / 还剩什么 / 经验是什么。最终对账后写
-完整复盘：v1→v2 对齐了 N 张，硬阻塞 M 张，下游看板已切流 K 张。
-```
-
-**四个活文档章节怎么用**（关键）：
-
-| 章节 | 实战用法 |
-|---|---|
-| **Progress** | 每张表的 direct-save / preview / execute / 验数四步都拆条目，时间戳记到分钟。失败的也写"已完成：写入；剩余：execute 报权限错"。30+ 张表的 Progress 应该有 100+ 条。 |
-| **Surprises & Discoveries** | B-17.6 差异追踪每一步的发现都进这里。字段隐藏换行、`<> NULL`、relativeFieldAlias 错位、上游运行权限不足、UNION 列差——每个都附 task error 原文摘录或 preview 截图作 evidence。 |
-| **Decision Log** | "为什么把门店信息降回 DIM"、"为什么放弃 v2 直留改 SQL 重写"、"为什么 dws_财务订单 不拆"。判断比代码更值钱，写清 Rationale 让接手人理解，不用反复决策。 |
-| **Outcomes & Retrospective** | 单张表跑通 = 一段小复盘；批次完成 = 中复盘；整套链路对账完 = 总复盘。"v1→v2 对齐了 27 张，硬阻塞 3 张（根因都是 ODS 空快照），下游看板切流 8 张" 这种结论必须落地。 |
-
-**小工程别用 ExecPlan**：单张表新建、单条 SQL 修复、单个报错排查——直接照 B-1~B-9 走，开 ExecPlan 是负担。判断阈值看 B-17.11 顶部"何时启用"。
-
-**深度参考**：完整 ExecPlan 规范见 [references/execplan-spec.md](references/execplan-spec.md)；OpenAI Codex 的 AGENTS.md 极简版调度规则见 [references/agents-rule.md](references/agents-rule.md)。
+📖 **[references/part-b17-fullchain-rewrite.md](references/part-b17-fullchain-rewrite.md)** — 完整方法论 11 节：何时用 B-17 / 4 件交付 / 8 条硬规则 / 5 步标准工作流 / 三层验收（数据集/副本页/卡片级）/ 差异追踪 5 步法 / 空快照处理标准 / 标准交付物清单 / 6 类专属常见坑 / 完成标准 6 项 / **B-17.11 用 ExecPlan 管理重写工程**（含 SmartETL 改写专用 ExecPlan 骨架，拿去直接填空）。
+
+**最简口诀**（10 秒决定要不要进 B-17）：
+- 只新建 1 个 SQL 节点数据集 → 走 B-3 ~ B-9，不进 B-17
+- 涉及"页面副本验收"或"卡片级数值对账"或"全链路追到原始源" → 必进 B-17
+- 30+ 表 / 跨多日 / 循环依赖拆解 → 进 B-17 + 走 B-17.11 ExecPlan
 
 ---
 
@@ -1838,7 +694,7 @@ function renderChart(data, clickFunc, config, helpers) {}
 - ❌ 把第一个参数 `data` 当 DOM 根节点 —— 错。要自己从 `document.querySelector(...)` 或 `document.body` 获取 DOM。
 - ✅ `helpers` 常见为 `{ refreshData, clickFunc }`
 
-`data` 形态多变，常见 4 种：
+`data` 形态多变，常见 5 种：
 
 ```javascript
 // 形态 1（最常见）
@@ -1864,66 +720,11 @@ function renderChart(data, clickFunc, config, helpers) {}
 
 **结论**：优先围绕 runtime `data` 写解析逻辑。`/api/card/.../data` 只用于核对证据，不要把它当 callback 结构直接照搬。
 
-## C-3. payload_json 取数排障（实战重灾区）
+## C-3. payload_json 取数排障（速查）
 
-### C-3.1 三种"拿不到 payload"的细分
+📖 **[references/part-c-payload-json.md](references/part-c-payload-json.md)** — 三种"拿不到 payload"的细分 / 最快判断方式 / `JSON.parse` 硬规则 / 截断错误（`Unterminated string` / `Unexpected end of JSON input`）的判断 / 推荐方案：拆列而非整包 JSON。
 
-```text
-1. runtime 里根本没有 payload_json     → 数据集没出 / 卡片配置错
-2. payload_json 在，但没被正确解包      → 解析逻辑问题
-3. payload_json 在，但字符串本身已损坏  → 数据链路截断
-```
-
-### C-3.2 最快判断方式
-
-- 卡片里临时输出 `data/config/helpers` 摘要
-- 抓 live 页 iframe 的 `window.PR_REPORT_CONTEXT`
-- 抓浏览器里真实发出的 `/api/card/.../data` 请求和响应
-
-### C-3.3 payload_json 硬规则
-
-```javascript
-JSON.parse(payload_json)  // 这才是最终判断标准
-```
-
-如果报：
-- `Unterminated string`
-- `Unexpected end of JSON input`
-- 其他明显截断类错误
-
-**优先判断为"数据链路把长字符串截断了"，不是图表 JS 自身问题。**
-
-这种情况下：
-- ❌ 不要继续堆兼容解析逻辑
-- ❌ 不要再试图用更多递归去"猜"
-- ✅ **优先改数据方案**
-
-### C-3.4 超长字符串的实战结论
-
-实战观察：live 页 runtime 明明有 `payload_json` 列，但里面的 JSON 字符串中途被截断 → `JSON.parse` 失败。
-
-页面表现：
-- 有 `report_date`
-- 标题能出来
-- 正文和 sections 都空
-- 或直接显示 `Unable to resolve payload_json`
-
-### C-3.5 推荐方案：拆列，不是整包 JSON
-
-不要把整份报告压成一个超长 `payload_json` 字段过图表数据链路。**拆成多列**：
-
-```text
-report_date
-send_window
-key_insights_md
-safety_intro_md
-productivity_intro_md
-service_intro_md
-quality_intro_md
-... 各 section 对应的明细列 / 明细子表
-```
-
-让前端直接读拆列后的字段，比 runtime 再 `JSON.parse(payload_json)` 稳得多。
+**最简结论**：JSON.parse 失败且报截断错时，**优先判断为数据链路把长字符串截断了**，不要继续堆兼容解析逻辑。改数据方案——把整份报告拆成多列（`report_date` / `key_insights_md` / 各 section 列）传给前端，比 runtime 再 `JSON.parse(payload_json)` 稳得多。
 
 ## C-4. 固定卡片 / overlay 场景
 
@@ -2044,17 +845,6 @@ new GDPlugin().init(renderChart);
 - [x] 桌面 / 手机态切换
 - [x] 原生浮动控件是否仍可见、可点
 
-## C-10. 触发场景示例
-
-- "自定义图表脚本不执行"
-- "payload_json 解析失败 / Unterminated string"
-- "固定卡片在副本页错位"
-- "复制页面后图表不出来"
-- "切页后 overlay 没消失"
-- "右侧导航被遮住点不动"
-- "iframe 懒加载怎么处理"
-- "renderChart 第一个参数到底是啥"
-
 ## C-11. 深度参考资料
 
 遇到复杂的固定卡片 / overlay / 锚点导航问题时，读：
@@ -2064,8 +854,45 @@ new GDPlugin().init(renderChart);
 
 ---
 
+## 📚 References 目录
+
+> 本 SKILL.md 主文是路由层；以下 8 个新文件（V1.4.0 引入）+ 4 个原贡献者文件构成完整知识库。详细索引：
+
+**马甲蒸馏版（V1.4.0 新建）：**
+
+| 文件 | 何时读 | 行数 |
+|---|---|---|
+| [part-a-commands.md](references/part-a-commands.md) | 写卡片、配 `--task` 缓存隔离、清理缓存时 | ~120 |
+| [part-a-cards.md](references/part-a-cards.md) | 写 `create-and-get` JSON 前查参数 / 图表类型 / filters / 看示例 | ~240 |
+| [guancli-commands.md](references/guancli-commands.md) | 用 guancli 探索 ETL/指标/任务/表单/通用 fetch 时 | ~160 |
+| [part-b-payload.md](references/part-b-payload.md) | 写新 ETL payload / 复用 4 阶段脚本时 | ~175 |
+| [part-b-errors.md](references/part-b-errors.md) | execute 失败、对照 `task error` 找修复方案时 | ~150 |
+| [part-b-sdk.md](references/part-b-sdk.md) | 30+ 表批量改造、写 `transformV2ToV3` 时 | ~60 |
+| [part-b17-fullchain-rewrite.md](references/part-b17-fullchain-rewrite.md) | 全链路 SmartETL 重写、副本页验收、ExecPlan 管理时 | ~290 |
+| [part-c-payload-json.md](references/part-c-payload-json.md) | runtime 拿不到 payload_json / JSON.parse 失败时 | ~60 |
+
+**贡献者原文（不修改，照引）：**
+
+| 文件 | 来源 |
+|---|---|
+| [etl-rewrite-original.md](references/etl-rewrite-original.md) | CTO 张进 — SmartETL 改写经验未删减原文 |
+| [custom-chart-playbook.md](references/custom-chart-playbook.md) | CTO 张进 — 自定义图表排障完整 playbook |
+| [execplan-spec.md](references/execplan-spec.md) | OpenAI Codex — ExecPlan 完整规范 |
+| [agents-rule.md](references/agents-rule.md) | OpenAI Codex — AGENTS.md 极简调度规则 |
+
+---
+
 ## 📋 版本记录
 
+- **V1.5.0** (2026-05-09)：架构重构 — Progressive Disclosure 改造，性能不变，省 token，结构更合理。
+  - 🏗️ **SKILL.md 大瘦身**：主文档从 2087 行 / 89 KB → ~913 行 / ~48 KB（瘦 56%），每次 skill 触发省 ~1.2 万 token。
+  - 📦 **拆出 8 个 references/ 文件**（马甲蒸馏版）：part-a-commands / part-a-cards / guancli-commands / part-b-payload（含原 B-8 复用模板）/ part-b-errors / part-b-sdk / part-b17-fullchain-rewrite / part-c-payload-json。每个 references 文件自包含 + 反向链接到主文相关章节。
+  - 🎯 **保留主文的章节**（高频/必读/决策框架）：Part 选择表、Part A 关键规则 + 命令骨架 8 条、B-0 工作流、B-1 API 全图、B-2 治理扫描（决策框架）、B-3 建目录、B-4 骨架（详见 references）、B-5 拿真错三步、B-6 校验工具集、B-7 删除拓扑（**含 V1.3.1 安全闸完整保留**）、B-9 速查表（10 类报错 1 行 1 条，详方案见 references）、B-10 字段审计、B-11 SDK 速查、B-12 经验 10 条、B-13 红线（19 条全保留）、B-14 API 速查、B-15 实战 ID、B-17 入口指针 + 决策口诀、Part C 全章节（仅 C-3 拆 references）。
+  - 🧹 **description 字段瘦身**：1089 字符 → 约 284 字符（-73%），删除内嵌的 30+ 个函数名/API 路径细节（这些信息的归宿是 SKILL.md 主体，不是 description）。LLM 触发判断更聚焦关键词。
+  - ❌ **删除冗余**：原 B-16 / C-10 "触发场景示例"两节删除（重复 description 信息，反 progressive disclosure）。
+  - ✏️ **修正 V1.3.1 之前已知小毛病**：原 L28 "操作前必读"标题为空 + L30 立即出现"关键规则"标题这种结构噪声合并清理。
+  - ⚠️ **manifest.json 的 `triggers` 字段标记为遗留**：Claude Code/OpenClaw/Codex 三个目标 agent 实际只读 SKILL.md frontmatter `description`，manifest.triggers 维护成本不带来对应收益。本版保留字段不删（避免破坏 schema 期望），但在字段后加注释说明"see SKILL.md description for the single source of truth"。
+  - 🔗 **基于 V1.4.0 npm 化**：保留并整合 V1.4.0 引入的 npm 包链接、`bin/install.js` 安装器、`package.json` 等基础设施；package.json `version` 同步升至 1.5.0 并随 npm publish 一起发出。
 - **V1.4.0** (2026-05-09)：npm package 化 — 现在可以一行 `npx` 安装到任意 agent 工具。
   - 📦 发布到 npm registry：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi)
   - 🚀 一行安装：`npx @supermajia/guanyuan-bi install` 自动检测当前机器上已装的 4 个 agent 工具并全部安装
