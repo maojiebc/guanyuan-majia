@@ -4,8 +4,9 @@
 > Compatible with **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** and any agent that recognizes `SKILL.md` frontmatter.
 > Battle-tested with 60+ ETL create/refactor/repair operations + governance scans + custom chart injection debugging.
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.5.2-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v1.5.3-blue)](./SKILL.md)
 [![GitHub Release](https://img.shields.io/github/v/release/maojiebc/guanyuan-majia?label=release&color=success)](https://github.com/maojiebc/guanyuan-majia/releases)
+[![skills.sh](https://skills.sh/b/maojiebc/guanyuan-majia)](https://skills.sh/maojiebc/guanyuan-majia)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-✓-orange)](https://docs.claude.com/en/docs/claude-code/skills)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-✓-blueviolet)](https://docs.openclaw.ai/tools/skills)
@@ -109,6 +110,19 @@ This skill is **tool-agnostic**. Any agent that supports the `SKILL.md` frontmat
 
 > **This repo uses git as the single source of truth** — not published to the npm registry. The one-line install experience is preserved via `node bin/install.js` and `npx github:` directly.
 
+### Option 0: GitHub CLI `gh skill` (GitHub CLI 2.90.0+)
+
+```bash
+# Install to user-level Codex / Claude Code / OpenClaw / Qoder, etc.
+gh skill install maojiebc/guanyuan-majia guanyuan-majia --agent codex --scope user
+gh skill install maojiebc/guanyuan-majia guanyuan-majia --agent claude-code --scope user
+gh skill install maojiebc/guanyuan-majia guanyuan-majia --agent openclaw --scope user
+gh skill install maojiebc/guanyuan-majia guanyuan-majia --agent qoder --scope user
+
+# Preview before installing
+gh skill preview maojiebc/guanyuan-majia guanyuan-majia
+```
+
 ### ⭐ Option 1: Clone + built-in install CLI (recommended)
 
 ```bash
@@ -168,13 +182,14 @@ cp config.example.json config.json
 vim config.json  # fill in BI base_url / login_id / password / default_pg_id / default_folder_id
 ```
 
-### Option 3: OpenClaw one-line install (if published to ClawHub)
+### Option 4: OpenClaw / ClawHub one-line install
 
 ```bash
 openclaw skills install guanyuan-majia
+clawhub install guanyuan-majia
 ```
 
-### Option 4: Hermes skillpack install (if published to gbrain registry)
+### Option 5: Hermes skillpack install (if published to gbrain registry)
 
 ```bash
 gbrain skillpack install guanyuan-majia
@@ -203,7 +218,7 @@ Copy `config.example.json` to `config.json` and fill in real credentials:
   "base_url": "https://your-bi-instance.example.com/",
   "domain": "guanbi",
   "login_id": "your_username@example.com",
-  "password": "your_password_here",
+  "password": "<BI_LOGIN_PASSWORD>",
   "default_pg_id": "your_default_page_id",
   "default_folder_id": "your_default_folder_id"
 }
@@ -368,6 +383,8 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 
 Full changelog in [SKILL.md version record](./SKILL.md#-版本记录).
 
+- **V1.5.3** (2026-05-10) — 📣 Distribution trust and brand entry polish. Aligns `SKILL.md` frontmatter with the Agent Skills spec; restores `LICENSE` to standard MIT text; adds `gh skill`, skills.sh, and ClawHub install paths plus the Super Majia author section; adds `SECURITY.md` and `llms.txt`; renames internal login parameters to reduce registry false positives.
+- **V1.5.2** (2026-05-09) — 📦 ClawHub publication prep. Adds `metadata.openclaw` to `SKILL.md`; adds WorkBuddy / Qoder compatibility badges; syncs version metadata to 1.5.2.
 - **V1.5.1** (2026-05-09) — 🪶 npm path simplified. Repo uses **git as the single source of truth**, not published to npm registry. The `bin/install.js` CLI experience is preserved; entry point switches from `npx @supermajia/guanyuan-bi` to `node bin/install.js` or `npx github:maojiebc/guanyuan-majia install` (npx natively supports GitHub URLs without npm registry). `package.json` / `manifest.json` / `.npmignore` retained as runtime metadata for the local install CLI; reusable should npm publishing be revived later.
 - **V1.5.0** (2026-05-09) — 🏗️ Progressive Disclosure refactor. `SKILL.md` shrunk from 2087 lines (89KB) to 913 lines (48KB), saving ~12K tokens per skill invocation. High-frequency content (Part router, decision framework, key APIs, error quick-ref, redlines, ID lookup) stays in the main doc; detailed playbooks moved into 8 new `references/` files (part-a-commands / part-a-cards / part-b-errors / part-b-payload / part-b-sdk / part-b17-fullchain-rewrite / part-c-payload-json / guancli-commands). Performance unchanged, zero content loss.
 - **V1.4.0** (2026-05-09) — 🛠️ Cross-tool install CLI added. New `bin/install.js` with `install` / `list` / `uninstall` commands (plus `--tool` / `--force` / `--dry-run` flags) auto-detects Claude Code / OpenClaw / Codex / Hermes and installs/upgrades into each, never overwriting the user's `config.json`. `package.json` / `.npmignore` shipped as packaging metadata (clarified to be local-only in V1.5.1).
@@ -388,6 +405,21 @@ Issues and PRs welcome:
 - 📝 Tested a new BI HTTP API endpoint? Add it to Part B's API map
 - 🎨 New custom chart scenario? Add it to Part C
 - 📚 Doc improvements, translations, typo fixes — PR directly
+
+---
+
+## Author
+
+**Super Majia | Majia**
+
+A field-born data and AI Agent operator from retail membership and private-domain operations. I focus on loyalty programs, CRM, store operations, user growth, data systems, BI/ETL governance, and practical AI tooling.
+
+This Skill packages Guandata BI querying, card creation, ETL governance, SmartETL rewrites, and custom chart debugging into reusable Agent capabilities.
+
+- WeChat Official Account: 超级马甲
+- Xiaohongshu: [超级马甲](https://xhslink.com/m/4fQMJeHHWKC)
+- X: [@maojiebc](https://x.com/maojiebc)
+- GitHub: [@maojiebc](https://github.com/maojiebc)
 
 ---
 

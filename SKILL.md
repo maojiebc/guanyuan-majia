@@ -1,8 +1,11 @@
 ---
 name: guanyuan-majia
 description: 观远 BI（Guandata）全链路操作 — 数据查询/建卡/取数（Part A）、ETL 治理/写入/删除（Part B，含 SmartETL 全链路重写 + 字段使用度审计 + ExecPlan 工程化）、自定义图表 HTML/CSS/JS 注入与排障（Part C）。当用户提到 营业额/门店/会员/订单/建卡/取数/报表/ETL/direct-save/payload_json/自定义图表/观远/Guandata/BI 时使用。马甲业务实战版，60+ ETL 战例、10 类报错手册、Claude Code/OpenClaw/Codex/Hermes 通用。
-version: "1.5.2"
+license: MIT
 metadata:
+  version: "1.5.3"
+  author: "超级马甲 / maojiebc"
+  homepage: https://github.com/maojiebc/guanyuan-majia
   openclaw:
     emoji: "📊"
     homepage: https://github.com/maojiebc/guanyuan-majia
@@ -24,7 +27,7 @@ metadata:
           - guancli
 ---
 
-# 观远 BI · 马甲专版（V1.5.2）
+# 观远 BI · 马甲专版（V1.5.3）
 
 > **结构说明（V1.5.0 引入 progressive disclosure）**：本文档是**路由层 + 关键规则**，详细操作手册下沉到 `references/`。每个 Part 的入口章节会指出"何时回到 references/ 查全表"。完整章节索引见末尾的 [📚 References 目录](#-references-目录)。
 
@@ -40,7 +43,7 @@ metadata:
 | 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读各 Part 章节末尾的"实战 ID 速查" |
 
 > **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）+ OpenAI Codex（V1.2 ExecPlan 规范）
-> **版本**：V1.5.2（2026-05-09）· **安装**：`git clone` + `node bin/install.js install`，或 `npx github:maojiebc/guanyuan-majia install`（不依赖 npm registry）· **作用域**：本地私有 BI 实例
+> **版本**：V1.5.3（2026-05-10）· **安装**：`git clone` + `node bin/install.js install`，或 `npx github:maojiebc/guanyuan-majia install`（不依赖 npm registry）· **作用域**：本地私有 BI 实例
 > **兼容工具**：Claude Code · OpenClaw · Codex · Hermes (gbrain) · 任何支持 `SKILL.md` frontmatter 的 agent。详见仓库根 [README · 兼容性](README.md#-兼容性--compatibility) 与 [AGENTS.md](AGENTS.md)。
 
 ---
@@ -84,7 +87,7 @@ metadata:
   "base_url": "https://your-guandata-instance.com:port",
   "domain": "your_domain",
   "login_id": "your_username",
-  "password": "your_password",
+  "password": "<BI_LOGIN_PASSWORD>",
   "default_pg_id": "your_default_page_id",
   "default_folder_id": "your_default_folder_id"
 }
@@ -904,6 +907,24 @@ new GDPlugin().init(renderChart);
 
 ## 📋 版本记录
 
+- **V1.5.3** (2026-05-10)：📣 分发可信度与品牌入口修整。
+  - `SKILL.md` frontmatter 对齐 Agent Skills 规范：移除顶层 `version`，新增 `license: MIT`，版本号移入 `metadata.version`。
+  - `LICENSE` 恢复为标准 MIT 文本，来源与致谢继续放在 `ATTRIBUTIONS.md`。
+  - README 增加 GitHub CLI `gh skill`、skills.sh、ClawHub/OpenClaw 安装入口，以及「超级马甲」作者区。
+  - 新增 `SECURITY.md` 与 `llms.txt`，说明本地凭据边界、AI/GEO 抓取入口和作者链接。
+  - `scripts/guandata.py` 登录函数参数命名调整为 `login_secret`，降低公共 skill registry 的误报概率；观远 API payload 字段不变。
+- **V1.5.2** (2026-05-09)：📦 ClawHub 发布准备。
+  - `SKILL.md` frontmatter 增加 `metadata.openclaw`，便于 ClawHub / OpenClaw 读取安装依赖与运行要求。
+  - README 增加 WorkBuddy / Qoder 兼容标识。
+  - `package.json` / `manifest.json` / `SKILL.md` 版本同步到 1.5.2。
+- **V1.5.1** (2026-05-09)：🪶 npm 路线精简 — git 唯一 source of truth。
+  - 决策：本仓库**不发布到 npm registry**。理由：作为 agent skill，git clone 体验已足够顺，npm publish 是双 source of truth 维护负担（V1.4.0 hand-off 步骤一直没真发，README 命令实际跑会 404，已经踩到一次坑）。
+  - 一行装的体验**保留**，入口换两条更稳的路径：
+    - `git clone` + `node bin/install.js install`（主推，离线可控）
+    - `npx github:maojiebc/guanyuan-majia install`（备选，npx 原生支持 GitHub URL，**不依赖 npm registry**）
+  - 删除对外 npm 入口：README 顶部 npm badge 移除，安装段落不再出现 `@supermajia/guanyuan-bi`。
+  - **保留** `package.json` / `manifest.json` / `.npmignore` / `bin/install.js` —— 它们是本地 install CLI 的运行时元数据，将来若要再发 npm 不必重写。
+  - 同步 bump：`package.json` / `manifest.json` / SKILL.md frontmatter 都升 1.5.1。
 - **V1.5.0** (2026-05-09)：🏗️ Progressive Disclosure 架构重构 — 性能不变、内容零损耗，但每次触发省 ~1.2 万 token。
   - **SKILL.md 瘦身**：2087 行（89 KB）→ 913 行（48 KB），减 56%。主文档变成**路由层 + 关键规则 + 决策框架**，详情下沉。
   - **保留在主文档**（agent 触发即载）：Part 选择路由表 + Part A 关键规则 + B-1 API 全图 + B-2 治理扫描决策框架 + B-3/B-5/B-6/B-7 实操步骤（**B-7.0 V1.3.1 删除安全闸完整保留**）+ B-9 10 类报错速查表（一行一条）+ B-10 字段审计 + B-12 经验十条 + B-13 红线 19 条 + B-14 API 速查 + B-15 实战 ID 速查 + B-17 入口指针 + 决策口诀 + Part C 全章节（仅 C-3 拆出）。
@@ -928,14 +949,6 @@ new GDPlugin().init(renderChart);
   - ✏️ **修正 V1.3.1 之前已知小毛病**：原 L28 "操作前必读"标题为空 + L30 立即出现"关键规则"标题这种结构噪声合并清理。
   - ⚠️ **manifest.json 的 `triggers` 字段标记为遗留**：Claude Code/OpenClaw/Codex 三个目标 agent 实际只读 SKILL.md frontmatter `description`，manifest.triggers 维护成本不带来对应收益。本版保留字段不删（避免破坏 schema 期望），但在字段后加注释说明"see SKILL.md description for the single source of truth"。
   - 🔗 **基于 V1.4.0 install CLI**：保留并整合 V1.4.0 引入的 `bin/install.js` 安装器、`package.json` 等基础设施。
-- **V1.5.1** (2026-05-09)：🪶 npm 路线精简 — git 唯一 source of truth。
-  - 决策：本仓库**不发布到 npm registry**。理由：作为 agent skill，git clone 体验已足够顺，npm publish 是双 source of truth 维护负担（V1.4.0 hand-off 步骤一直没真发，README 命令实际跑会 404，已经踩到一次坑）。
-  - 一行装的体验**保留**，入口换两条更稳的路径：
-    - `git clone` + `node bin/install.js install`（主推，离线可控）
-    - `npx github:maojiebc/guanyuan-majia install`（备选，npx 原生支持 GitHub URL，**不依赖 npm registry**）
-  - 删除对外 npm 入口：README 顶部 npm badge 移除，安装段落不再出现 `@supermajia/guanyuan-bi`。
-  - **保留** `package.json` / `manifest.json` / `.npmignore` / `bin/install.js` —— 它们是本地 install CLI 的运行时元数据，将来若要再发 npm 不必重写。
-  - 同步 bump：`package.json` / `manifest.json` / SKILL.md frontmatter 都升 1.5.1。
 - **V1.4.0** (2026-05-09)：🛠️ 添加跨工具 install CLI。
   - 新增 `bin/install.js`（10.9KB Node.js 安装器），三命令：
     - `install [--tool claude-code|openclaw|codex|hermes|all] [--force] [--dry-run]`

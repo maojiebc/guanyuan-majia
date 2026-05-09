@@ -2,10 +2,16 @@
   "$schema": "https://json.schemastore.org/skill-manifest",
   "name": "guanyuan-majia",
   "displayName": "Guanyuan-Majia · Guandata BI Skill",
-  "version": "1.5.2",
-  "description": "Tool-agnostic Claude Code / OpenClaw / Codex / Hermes skill for Guandata BI (观远 BI). Three capabilities: data query & card creation (Part A), ETL governance & write (Part B, incl. SmartETL full-chain rewrite & ExecPlan), custom chart dev & debugging (Part C). Battle-tested with 60+ ETL operations. V1.5.0 refactored into progressive disclosure: SKILL.md is the router (913 lines, ~48 KB), references/ holds detailed playbooks (8 new files). V1.5.1 simplified install path — git is the single source of truth (no npm publish); install via `git clone` + `node bin/install.js install` or `npx github:maojiebc/guanyuan-majia install`.",
+  "version": "1.5.3",
+  "description": "Tool-agnostic Claude Code / OpenClaw / Codex / Hermes skill for Guandata BI (观远 BI). Three capabilities: data query & card creation (Part A), ETL governance & write (Part B, incl. SmartETL full-chain rewrite & ExecPlan), custom chart dev & debugging (Part C). Battle-tested with 60+ ETL operations. Progressive disclosure keeps SKILL.md as the router and references/ as detailed playbooks. Install via `gh skill`, `git clone` + `node bin/install.js install`, `npx github:maojiebc/guanyuan-majia install`, or ClawHub/OpenClaw.",
   "license": "MIT",
   "author": "maojiebc",
+  "authorDisplayName": "超级马甲",
+  "social": {
+    "x": "https://x.com/maojiebc",
+    "xiaohongshu": "https://xhslink.com/m/4fQMJeHHWKC",
+    "wechatOfficialAccount": "超级马甲"
+  },
   "homepage": "https://github.com/maojiebc/guanyuan-majia",
   "repository": "https://github.com/maojiebc/guanyuan-majia",
   "entry": "SKILL.md",
