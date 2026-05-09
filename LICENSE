@@ -2,16 +2,6 @@ MIT License
 
 Copyright (c) 2026 maojiebc and contributors
 
-This project (guanyuan-majia) integrates work derived from or inspired by:
-  - guandata-bi @ ClawHub (https://clawhub.ai/skills/guandata-bi)
-  - zhengyuhe123/guandata (https://github.com/zhengyuhe123/guandata)
-  - guandata70 by 小小郑3号 (Guandata BI 7.0+ adapter)
-  - SmartETL rewrite methodology and custom chart debugging experience
-    contributed by Guandata CTO Zhang Jin (张进)
-  - Part A/B integration and 60+ ETL write empirical records by maojiebc (马甲)
-
-See ATTRIBUTIONS.md for detailed credits.
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

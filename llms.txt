@@ -1,0 +1,34 @@
+# guanyuan-majia
+
+> A tool-agnostic Agent Skill for Guandata BI (观远 BI), created by 超级马甲 / maojiebc. It packages data querying, card creation, ETL governance/write workflows, SmartETL full-chain rewrites, and custom chart debugging into reusable AI agent instructions and scripts.
+
+## Primary Links
+
+- Repository: https://github.com/maojiebc/guanyuan-majia
+- Skill entry: https://github.com/maojiebc/guanyuan-majia/blob/main/SKILL.md
+- Chinese README: https://github.com/maojiebc/guanyuan-majia/blob/main/README.md
+- English README: https://github.com/maojiebc/guanyuan-majia/blob/main/README.en.md
+- Security policy: https://github.com/maojiebc/guanyuan-majia/blob/main/SECURITY.md
+- Attribution: https://github.com/maojiebc/guanyuan-majia/blob/main/ATTRIBUTIONS.md
+
+## Skill Contents
+
+- `SKILL.md`: routing layer and core operating rules for agents.
+- `scripts/guandata.py`: local Guandata BI API client for Part A data query/card workflows.
+- `references/part-a-commands.md`: Part A command reference.
+- `references/part-a-cards.md`: card creation parameters and examples.
+- `references/guancli-commands.md`: guancli command reference.
+- `references/part-b-payload.md`: ETL payload schema and write workflow.
+- `references/part-b-errors.md`: ETL error diagnosis playbook.
+- `references/part-b-sdk.md`: v2 to v3 batch migration SDK notes.
+- `references/part-b17-fullchain-rewrite.md`: SmartETL full-chain rewrite methodology.
+- `references/part-c-payload-json.md`: custom chart `payload_json` troubleshooting.
+
+## Author
+
+超级马甲 / maojiebc focuses on retail membership operations, private-domain growth, CRM/user operations, data systems, BI/ETL governance, AI tools, and practical Agent Skills.
+
+- GitHub: https://github.com/maojiebc
+- X: https://x.com/maojiebc
+- Xiaohongshu: https://xhslink.com/m/4fQMJeHHWKC
+- WeChat Official Account: 超级马甲

@@ -45,7 +45,7 @@ class GuandataClient:
     DEFAULT_BASE_URL = _CFG.get("base_url", "")
     DEFAULT_DOMAIN = _CFG.get("domain", "guanbi")
     DEFAULT_LOGIN_ID = _CFG.get("login_id", "")
-    DEFAULT_PASSWORD = _CFG.get("password", "")
+    DEFAULT_LOGIN_SECRET = _CFG.get("password", "")
     TOKEN_LIFETIME = 7200  # token有效期2小时（秒）
     
     # 超时配置（秒）
@@ -130,7 +130,7 @@ class GuandataClient:
         self.token_expire_at: Optional[float] = None  # token过期时间戳
         self._login_domain = self.DEFAULT_DOMAIN
         self._login_id = self.DEFAULT_LOGIN_ID
-        self._login_password = self.DEFAULT_PASSWORD
+        self._login_secret = self.DEFAULT_LOGIN_SECRET
         
         # 检查配置是否完整
         config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'config.json')
@@ -139,7 +139,7 @@ class GuandataClient:
             missing.append("base_url")
         if not self._login_id:
             missing.append("login_id")
-        if not self._login_password:
+        if not self._login_secret:
             missing.append("password")
         
         if missing:
@@ -181,7 +181,7 @@ class GuandataClient:
             await self.login(
                 domain=self._login_domain,
                 login_id=self._login_id,
-                password=self._login_password
+                login_secret=self._login_secret
             )
             return True
         except Exception as e:
@@ -190,13 +190,13 @@ class GuandataClient:
 
     # ===== 认证相关 =====
 
-    async def login(self, domain: str, login_id: str, password: str) -> Dict[str, Any]:
+    async def login(self, domain: str, login_id: str, login_secret: str) -> Dict[str, Any]:
         """用户登录获取token
 
         Args:
             domain: 域名
             login_id: 登录ID
-            password: 原始密码（会自动Base64编码）
+            login_secret: 登录凭据原文（会按观远接口要求进行 Base64 编码）
 
         Returns:
             包含token和过期时间的响应
@@ -204,10 +204,10 @@ class GuandataClient:
         # 保存登录信息，用于token过期后自动重新登录
         self._login_domain = domain
         self._login_id = login_id
-        self._login_password = password
+        self._login_secret = login_secret
 
-        # 密码Base64编码
-        password_encoded = base64.b64encode(password.encode()).decode()
+        # 观远 public-api/sign-in 要求登录凭据经 Base64 编码后提交到用户配置的 BI 实例。
+        encoded_login_secret = base64.b64encode(login_secret.encode()).decode()
 
         async with httpx.AsyncClient(timeout=self.LOGIN_TIMEOUT) as client:
             response = await client.post(
@@ -215,7 +215,7 @@ class GuandataClient:
                 json={
                     "domain": domain,
                     "loginId": login_id,
-                    "password": password_encoded,
+                    "password": encoded_login_secret,
                 },
                 headers=self._get_headers(include_token=False),
             )
@@ -1688,7 +1688,7 @@ async def resolve_ds_id(client: GuandataClient, ds_input: str) -> str:
 
 async def cmd_list_datasets(args):
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     result = await client.search_datasets_list(use_cache=not args.refresh)
     datasets = result.get('contents', [])
     
@@ -1772,7 +1772,7 @@ async def cmd_list_datasets(args):
 
 async def cmd_get_columns(args):
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     args.ds_id = await resolve_ds_id(client, args.ds_id)
 
     # 先拉数据集列表获取 datasourceModifyTime
@@ -1852,7 +1852,7 @@ async def cmd_query(args):
         sys.exit(1)
     
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     args.ds_id = await resolve_ds_id(client, args.ds_id)
     
     filter_obj = None
@@ -1932,7 +1932,7 @@ async def cmd_search_values(args):
     # 通过字段名解析 fdId
     if not fd_id and args.name:
         client_tmp = GuandataClient()
-        await client_tmp.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+        await client_tmp.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
         # 先尝试缓存
         cached = client_tmp._load_cached_columns(args.ds_id)
         if cached:
@@ -1980,7 +1980,7 @@ async def cmd_search_values(args):
         sys.exit(1)
 
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     result = await client.search_column_values(
         ds_id=args.ds_id,
         fd_id=fd_id,
@@ -2004,7 +2004,7 @@ async def cmd_search_values(args):
 
 async def cmd_list_pages(args):
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     result = await client.search_pages()
     
     if args.json:
@@ -2062,7 +2062,7 @@ async def cmd_list_pages(args):
 async def cmd_create_page(args):
     """创建BI页面"""
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
 
     result = await client.create_page(
         name=args.name,
@@ -2090,7 +2090,7 @@ async def cmd_get_page_cards(args):
         sys.exit(1)
 
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     result = await client.get_page_cards(args.pg_id)
 
     if args.json:
@@ -2106,7 +2106,7 @@ async def cmd_get_page_cards(args):
 async def cmd_create_card(args):
     """创建卡片 — 直接调用 client.create_card_smart"""
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
 
     try:
         params = json.loads(args.params_json)
@@ -2143,7 +2143,7 @@ async def cmd_create_card(args):
 
 async def cmd_get_card_data(args):
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
 
     if not args.card_id:
         print('❌ 缺少 card_id')
@@ -2293,7 +2293,7 @@ async def cmd_delete_cards(args):
         sys.exit(1)
 
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     result = await client.batch_delete_cards(args.card_ids, args.pg_id)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
@@ -2306,7 +2306,7 @@ async def cmd_release_page(args):
         sys.exit(1)
 
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
     result = await client.release_page(args.pg_id)
     
     if 'error' in result:
@@ -2372,7 +2372,7 @@ async def cmd_create_and_get(args):
     """一步创建卡片并获取渲染数据"""
     import time
     client = GuandataClient()
-    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_PASSWORD)
+    await client.login(GuandataClient.DEFAULT_DOMAIN, GuandataClient.DEFAULT_LOGIN_ID, GuandataClient.DEFAULT_LOGIN_SECRET)
 
     try:
         params = json.loads(args.params_json)
