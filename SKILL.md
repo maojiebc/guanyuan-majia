@@ -1,10 +1,10 @@
 ---
 name: guanyuan-majia
 description: 观远 BI（马甲专版 V1.1）— 数据查询/建卡/取数 + ETL 治理/写入/删除 + 自定义图表开发 全链路。Part A：用 guandata.py 做数据获取与分析（list-datasets / get-columns / search-values / create-and-get / create-card / get-card-data / delete-cards / create-page / release-page / list-pages）+ guancli 只读探索（ds/etl/page/card/metric/task/form/fetch）。Part B：用 guancli 做 ETL 治理与写入全链路（POST /api/directory ETL/DATA_SET 双树建目录、POST /api/etl/direct-save create+update 同接口、POST /api/etl/execute、GET /api/task 拿真实错误、DELETE /api/data-source 先于 DELETE /api/etl、批量扫描判断 ETL/字段去留、ODS/DIM/DWD/DWS/APP 五层分层、字段使用度双源审计、v2→v3 批量改造 SDK、CTO 张进的 SmartETL 全链路重写方法论：全链路追到原始源/旧资产只读/新链只允许 SQL 节点/双层结构+数值验收/副本页卡片级验收/差异追踪 5 步法/空快照处理标准/ExecPlan+modeling+evidence 交付物），10 类高频报错修复。Part C：自定义图表 HTML/CSS/JS 注入开发与排障（renderChart 4 参数 runtime 契约、payload_json 截断判断、固定卡片/overlay/z-index/stacking context、复制页 card id 重定位、懒加载 iframe、路由切换销毁注入物、live 浏览器验收、payload_json 拆列方案）。触发词：查数据、做图表、看报表、营业额、门店、会员、订单、分析、建卡、取数、删卡、ETL 治理、循环依赖、字段使用度、新建 ETL、修改 ETL、direct-save、ETL 报错、execute 失败、批量迁移 ETL、SmartETL 改写、全链路重写、副本页验收、差异追踪、空快照、自定义图表、HTML 注入、JS 注入、payload_json、overlay、固定卡片、z-index、看 BI HTTP API。
-version: "1.1"
+version: "1.2"
 ---
 
-# 观远 BI · 马甲专版（V1.1）
+# 观远 BI · 马甲专版（V1.2）
 
 ## 🧭 Part 选择
 
@@ -13,11 +13,12 @@ version: "1.1"
 | 查数据、建卡、生成报表、做分析 | **Part A：数据查询与卡片创建** |
 | 扫整库 ETL 治理 / 新建/修改/删除 ETL / 字段使用度审计 / 修复 ETL 报错 | **Part B：ETL 治理与写入** |
 | 把整条 SmartETL 链改写成 SQL 版 + 页面副本验收 + 差异定位 + 空快照阻塞 | **Part B-17：全链路重写方法论** |
+| 30+ 张表批量迁移 / 跨多日工程 / 复杂重构需要项目化追踪 | **Part B-17.11：ExecPlan 工作法**（V1.2 新增） |
 | 自定义图表 HTML/CSS/JS 注入、固定卡片/overlay、payload_json 取数、路由清理 | **Part C：自定义图表开发与排障** |
 | 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读章节末尾的"实战 ID 速查" |
 
-> **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）
-> **版本**：V1.1（2026-05-09）· **作用域**：本地私有 BI 实例
+> **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）+ OpenAI Codex（V1.2 ExecPlan 规范）
+> **版本**：V1.2（2026-05-09）· **作用域**：本地私有 BI 实例
 
 ---
 
@@ -1405,6 +1406,8 @@ sql = sql.replace(
 9. **批量任务异步监控**：`until` 循环 + `etl search | grep -c PROCESSING` 比单 task 轮询效率高。
 10. **新旧并行**：v2 链路与 v1 并行，对账无误后再下线 v1。
 
+> 💡 **30+ 张表跨多日的工程必须走 ExecPlan**：不要靠零散 todo + 群消息 + 临时 markdown 来追踪进度。直接走 **B-17.11** 的 ExecPlan 工作法——四个活文档章节（Progress / Surprises & Discoveries / Decision Log / Outcomes & Retrospective）能把治理判断、循环依赖拆法、字段隐藏换行这类"踩坑—修复"轨迹完整落到一份自包含文档里，下一个接手的人不用问任何上下文就能继续。
+
 ---
 
 ## B-13. ETL 治理与写入红线
@@ -1694,6 +1697,102 @@ output/<restart_tag>/
 - [x] 非阻塞范围内，**卡片级**结果与原页一致
 - [x] 阻塞范围内，根因已被定位到真实空源或平台限制，**并明确留证**
 
+### B-17.11 用 ExecPlan 管理重写工程（V1.2 新增）
+
+> 借自 OpenAI Codex 的 ExecPlan 规范（[references/execplan-spec.md](references/execplan-spec.md)）。这套方法论的精髓：**让一个完全没上下文的新人，仅凭 ExecPlan 文档本身就能端到端继续这项重写工作。** SmartETL 全链路重写动辄跨多日、跨几十张表、涉及循环依赖拆解和副本页验收，正是 ExecPlan 的最佳适用场景。
+
+**何时启用**：当本次重写工作满足以下任一条件，就开 ExecPlan：
+
+- 涉及 5 张以上 ETL 重建
+- 跨工作日（不能一次性收口）
+- 包含循环依赖拆解（一动牵动多张表）
+- 需要副本页 + 卡片级验收
+- 上游存在空快照需要写明硬阻塞
+
+**核心约束**（来自 ExecPlan 规范，照抄）：
+
+- **自包含**：ExecPlan 不依赖任何外部上下文。读者只有当前工作树和这份文档。
+- **活文档**：每个停顿点都要更新 Progress / Surprises / Decision Log，**不是事后补**。
+- **可观察结果锚定**：验收标准写"卡片 X 在副本页用原 payload 重放，上海 2 月营业额与原页一致到分"，不写"代码层面满足某个定义"。这条跟 B-17.7"空快照不能写已完成对齐"是同一个原则的两种表达。
+
+**SmartETL 改写专用 ExecPlan 骨架**（拿去直接填空，不用从通用模板自己映射）：
+
+```text
+# SmartETL 全链路重写 · <项目代号>
+
+本 ExecPlan 按 references/execplan-spec.md 维护，必须保持 Progress /
+Surprises & Discoveries / Decision Log / Outcomes & Retrospective 始终为最新。
+
+## Purpose / Big Picture
+
+这次重写完成后，<业务方> 在 <副本页 URL> 上看到的 <卡片清单> 全部由
+新 SQL 链 v2 数据集驱动，不再依赖任何旧 ETL；<指定卡片> 与原页数值
+一致，差异 < 1%；<空快照阻塞表> 已明确根因留证。
+
+## 范围 / 命名 / 验收（B-17.1 锁定项）
+
+- 正式范围：<页面 ID> · 数据集 N 个 · ETL N 个
+- 旧资产只读：<旧目录路径>，绝不修改
+- v2 落地：ETL 目录 <NEW_ETL_DIR_ID> · 数据集目录 <NEW_DS_DIR_ID>
+- 命名：dwd_xxx_v2 / dws_xxx_v2 / dim_xxx_v2，业务原名挂在 description
+- 暂停条件：上游空快照 / 平台限制 / 副本页卡片 > 3 张数值偏差
+- 验收：B-17.10 六项必须全勾
+
+## Progress
+
+- [ ] (待时间戳) 治理扫描完成（依赖图 / 循环组 / 复杂度 → analysis.json）
+- [ ] (待时间戳) 第一批 5 张 ETL 写入 + 节点预览通过
+- [ ] (待时间戳) 第一批 execute 落表 + ds preview 验数
+- [ ] (待时间戳) 副本页卡片切换 + payload 重放对账
+- [ ] ...（每张表、每次预览、每次 execute、每张卡片对账都拆条目）
+
+## Surprises & Discoveries
+
+- Observation: <字段名带隐藏换行 / <> NULL 把行过滤光 / SQL 字段名是 sql 不是 sqlScript / ...>
+  Evidence: <task error 摘录 / preview 0 行截图 / payload 片段>
+
+## Decision Log
+
+- Decision: 把"门店信息—马甲"降回纯 DIM，经营状态字段迁到 dws_store_operating_status
+  Rationale: 该表处于 5 张表循环依赖中心，不拆循环就一直反向依赖订单明细
+  Date/Author: 2026-XX-XX / <你>
+
+## Plan of Work
+
+按 B-17.4 的 5 步推进：锁范围 → 拉血缘 → 判断到原始源 → 重建顺序（上游先）
+→ 每对象重建模板。先写最上游清洗层 v2，再共享中间 ADS，再最终消费 ADS，
+最后副本页切换。
+
+## Concrete Steps
+
+每张表的具体命令、payload 路径、dataFlowId、taskId、节点 OUTPUT id（带 _out 后缀）
+落到这里，方便接手人原样复跑。
+
+## Validation and Acceptance
+
+- 数据集层：guancli ds get <dsId> --brief 看行列数与旧对象差异 < 1%
+- 卡片层：抓原页 runtime payload，副本卡切新 ds 重放，<指定卡片> 数值一致
+- 空快照层：明确写"全链路 SQL 重写完成，<根阻塞源> 数值验收硬阻塞"
+
+## Outcomes & Retrospective
+
+每完成一个里程碑写一段：完成什么 / 还剩什么 / 经验是什么。最终对账后写
+完整复盘：v1→v2 对齐了 N 张，硬阻塞 M 张，下游看板已切流 K 张。
+```
+
+**四个活文档章节怎么用**（关键）：
+
+| 章节 | 实战用法 |
+|---|---|
+| **Progress** | 每张表的 direct-save / preview / execute / 验数四步都拆条目，时间戳记到分钟。失败的也写"已完成：写入；剩余：execute 报权限错"。30+ 张表的 Progress 应该有 100+ 条。 |
+| **Surprises & Discoveries** | B-17.6 差异追踪每一步的发现都进这里。字段隐藏换行、`<> NULL`、relativeFieldAlias 错位、上游运行权限不足、UNION 列差——每个都附 task error 原文摘录或 preview 截图作 evidence。 |
+| **Decision Log** | "为什么把门店信息降回 DIM"、"为什么放弃 v2 直留改 SQL 重写"、"为什么 dws_财务订单 不拆"。判断比代码更值钱，写清 Rationale 让接手人理解，不用反复决策。 |
+| **Outcomes & Retrospective** | 单张表跑通 = 一段小复盘；批次完成 = 中复盘；整套链路对账完 = 总复盘。"v1→v2 对齐了 27 张，硬阻塞 3 张（根因都是 ODS 空快照），下游看板切流 8 张" 这种结论必须落地。 |
+
+**小工程别用 ExecPlan**：单张表新建、单条 SQL 修复、单个报错排查——直接照 B-1~B-9 走，开 ExecPlan 是负担。判断阈值看 B-17.11 顶部"何时启用"。
+
+**深度参考**：完整 ExecPlan 规范见 [references/execplan-spec.md](references/execplan-spec.md)；OpenAI Codex 的 AGENTS.md 极简版调度规则见 [references/agents-rule.md](references/agents-rule.md)。
+
 ---
 
 # 🆎 Part C：自定义图表开发与排障（V1.1 新增）
@@ -1962,6 +2061,10 @@ new GDPlugin().init(renderChart);
 
 ## 📋 版本记录
 
+- **V1.2** (2026-05-09)：吸收 OpenAI Codex 的 ExecPlan 规范用于 SmartETL 重写工程化。
+  - 新增 **B-17.11 用 ExecPlan 管理重写工程**：何时启用判断 + 三项核心约束（自包含 / 活文档 / 可观察结果锚定）+ SmartETL 改写专用 ExecPlan 骨架（拿去填空，不用从通用模板自己映射）+ 四个活文档章节实战用法（Progress / Surprises & Discoveries / Decision Log / Outcomes & Retrospective）+ 小工程不用 ExecPlan 的判断阈值。
+  - 新增 **B-12 ExecPlan 指针**：30+ 张表跨多日工程必须走 ExecPlan，不靠零散 todo。
+  - `references/` 新增 `execplan-spec.md`（OpenAI Codex ExecPlan 完整规范）+ `agents-rule.md`（极简调度规则）。
 - **V1.1** (2026-05-09)：整合观远 CTO 张进的两份核心经验。
   - 新增 **B-17 全链路重写方法论**（10 节）：4 件交付 + 8 条硬规则 + 5 步标准工作流 + 三层验收（数据集/副本页/卡片级）+ 差异追踪 5 步法 + 空快照处理标准 + ExecPlan/modeling/evidence/sql/raw 标准交付物 + 6 类专属常见坑 + 完成标准。
   - 新增 **Part C 自定义图表开发与排障**（10 节）：renderChart 4 参数 runtime 契约 + data 5 种形态识别 + payload_json 截断判断 3 步 + 拆列推荐方案 + overlay/mask 挂页面根节点 + z-index 基线（8/1/20）+ 懒加载 iframe 处理 + 路由切换销毁规则 + MutationObserver 死循环陷阱 + 复制页 card id 重定位 + 浏览器层级排障清单 + 最终真实浏览器验收 8 项。

@@ -3,7 +3,7 @@
 > Claude Code Skill for **观远 BI / Guandata** — 数据查询 / ETL 治理与写入 / 自定义图表开发，**全栈三合一**。
 > 60+ 张 ETL 创建/重构/修复 + 治理扫描 + 自定义图表注入排障的真实战场记录。
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.1-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2-blue)](./SKILL.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Skill-orange)](https://docs.claude.com/en/docs/claude-code/skills)
 [![BI](https://img.shields.io/badge/Guandata-BI_6.x_/_7.x-purple)](https://www.guandata.com/)
@@ -230,7 +230,9 @@ guanyuan-majia/
 │   └── zonedata_builder/             # zoneData 构建模块
 └── references/                       # 深度参考资料
     ├── custom-chart-playbook.md      # CTO 张进自定义图表完整排障手册原文
-    └── etl-rewrite-original.md       # CTO 张进 SmartETL 改写经验原文
+    ├── etl-rewrite-original.md       # CTO 张进 SmartETL 改写经验原文
+    ├── execplan-spec.md              # OpenAI Codex ExecPlan 规范（V1.2 新增）
+    └── agents-rule.md                # OpenAI Codex 极简调度规则（V1.2 新增）
 ```
 
 ---
@@ -251,6 +253,7 @@ guanyuan-majia/
 | "做副本页验收 / 卡片级对比" | **B-17** |
 | "上游空快照怎么写结论" | **B-17** |
 | "差异定位到底在 SQL 还是执行时点" | **B-17** |
+| "30+ 表跨多日工程怎么管 / 给我 ExecPlan 骨架" | **B-17.11** |
 | "自定义图表脚本不执行 / payload_json 报错" | **C** |
 | "固定卡片错位 / overlay 切页残留" | **C** |
 | "renderChart 第一个参数到底是啥" | **C** |
@@ -265,9 +268,10 @@ guanyuan-majia/
 - **[zhengyuhe123/guandata](https://github.com/zhengyuhe123/guandata)** — guandata 原始 GitHub 项目
 - **小小郑3号 · guandata70** — 观远 7.0+ 适配版（draft/release 机制），本项目 Part A 的直接前身
 - **观远 BI CTO 张进** — Part B-17（SmartETL 全链路重写方法论）+ Part C（自定义图表开发与排障）的核心经验贡献者
+- **OpenAI Codex** — V1.2 引入的 [ExecPlan 规范](./references/execplan-spec.md)（自包含活文档 + 四章节项目管理结构），用于 30+ 张表跨多日 SmartETL 重写工程的项目化追踪
 - **马甲（@maojiebc）** — Part A/B 实战整合与 60+ 张 ETL 写入实证记录
 
-> 没有 ClawHub / 张进 / 小小郑3号的开源精神，这份 skill 不可能存在。
+> 没有 ClawHub / 张进 / 小小郑3号 / OpenAI Codex 的开源精神，这份 skill 不可能存在。
 
 ---
 
@@ -275,6 +279,7 @@ guanyuan-majia/
 
 完整变更历史见 [SKILL.md 末尾的版本记录](./SKILL.md#-版本记录)。
 
+- **V1.2** (2026-05-09) — 吸收 OpenAI Codex 的 ExecPlan 规范，新增 B-17.11 用 ExecPlan 管理重写工程（SmartETL 改写专用骨架 + 四个活文档章节实战用法）+ B-12 工程化指针；`references/` 加 execplan-spec.md + agents-rule.md
 - **V1.1** (2026-05-09) — 整合 CTO 张进的两份经验：B-17 全链路重写方法论 + Part C 自定义图表
 - **V1.0** (2026-05-09) — 重命名 `guandata70` → `guanyuan-majia`，新增 Part B：ETL 治理与写入完整指南
 - **V0.x** (2026-03-30) — guandata70 初版（小小郑3号），适配观远 BI 7.0+

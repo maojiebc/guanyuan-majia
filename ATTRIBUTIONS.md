@@ -42,6 +42,13 @@ This skill is built on top of multiple predecessors and contributions from the G
   - **Part C 自定义图表开发与排障** — 完整的 HTML/CSS/JS 注入开发与浏览器排障经验，包括 renderChart 4 参数 runtime 契约、payload_json 截断判断、固定卡片/overlay/z-index/stacking context、复制页 card id 重定位、懒加载 iframe 处理、路由切换销毁规则等
 - **Original docs preserved / 原文留档**: [`references/etl-rewrite-original.md`](./references/etl-rewrite-original.md), [`references/custom-chart-playbook.md`](./references/custom-chart-playbook.md)
 
+### OpenAI Codex
+
+- **Source / 来源**: 用户提供的两份 OpenAI 官方文档 `PLANS.md`（ExecPlan 规范）和 `AGENTS.md`（极简调度规则），原文留档于 [`references/execplan-spec.md`](./references/execplan-spec.md) 和 [`references/agents-rule.md`](./references/agents-rule.md)。
+- **Contribution / 贡献**:
+  - **B-17.11 用 ExecPlan 管理重写工程**（V1.2 新增）— 借自 ExecPlan 规范的核心精神（自包含 + 活文档 + 可观察结果锚定）+ 四个活文档章节（Progress / Surprises & Discoveries / Decision Log / Outcomes & Retrospective），用于 30+ 张表跨多日 SmartETL 重写工程的项目化追踪。
+  - **B-12 ExecPlan 指针** — 批量迁移工程经验入口处的判断阈值。
+
 ### maojiebc (马甲)
 
 - **GitHub**: https://github.com/maojiebc
@@ -49,6 +56,7 @@ This skill is built on top of multiple predecessors and contributions from the G
   - V1.0 重新整合：将 guandata70 + ETL 治理与写入实战经验合并为 `guanyuan-majia`
   - **Part B ETL 治理与写入实证** — 60+ 张 ETL 创建/重构/修复的真实战场记录，包括 11 个已实测 BI HTTP API endpoint、8 维 ETL + 4 维字段去留判断、ODS/DIM/DWD/DWS/APP 五层分层、字段使用度双源审计（page+etl）、v2→v3 批量改造 SDK、10 类高频报错修复手册
   - V1.1 整合 CTO 张进经验
+  - V1.2 整合 OpenAI Codex ExecPlan 规范并定制化为 SmartETL 重写场景骨架
   - 所有文档双语化（中文 / 英文）
   - 公开发布到 GitHub
 
@@ -76,6 +84,7 @@ For original sources whose licenses differ:
 - `zhengyuhe123/guandata`: refer to upstream LICENSE
 - guandata70 by 小小郑3号: 用户本地 skill，作者授权 / Internal skill, original author granted use
 - CTO 张进经验文档: 用户内部分享 / Internal sharing, granted to integrate
+- OpenAI Codex `PLANS.md` / `AGENTS.md`: 由用户提供原文，作者署名 OpenAI Codex / Provided by user, attribution to OpenAI Codex
 
 If you are a rights-holder of any of the above and want adjustments to attribution or license, please open an issue.
 

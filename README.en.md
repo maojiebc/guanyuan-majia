@@ -3,7 +3,7 @@
 > Claude Code Skill for **Guandata BI (观远 BI)** — Data analysis / ETL governance & write / Custom chart development, **all-in-one**.
 > Battle-tested with 60+ ETL create/refactor/repair operations + governance scans + custom chart injection debugging.
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.1-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2-blue)](./SKILL.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Skill-orange)](https://docs.claude.com/en/docs/claude-code/skills)
 [![BI](https://img.shields.io/badge/Guandata-BI_6.x_/_7.x-purple)](https://www.guandata.com/)
@@ -231,7 +231,9 @@ guanyuan-majia/
 │   └── zonedata_builder/             # zoneData builder module
 └── references/                       # Deep reference docs
     ├── custom-chart-playbook.md      # CTO Zhang Jin's full custom chart playbook (original)
-    └── etl-rewrite-original.md       # CTO Zhang Jin's SmartETL rewrite experience (original)
+    ├── etl-rewrite-original.md       # CTO Zhang Jin's SmartETL rewrite experience (original)
+    ├── execplan-spec.md              # OpenAI Codex ExecPlan specification (V1.2)
+    └── agents-rule.md                # OpenAI Codex minimal scheduling rule (V1.2)
 ```
 
 ---
@@ -252,6 +254,7 @@ guanyuan-majia/
 | "Replica page verification / card-level comparison" | **B-17** |
 | "How to write conclusions for empty upstream snapshots" | **B-17** |
 | "Diff tracking — is it SQL bug or execution timing?" | **B-17** |
+| "30+ table multi-day project — give me an ExecPlan skeleton" | **B-17.11** |
 | "Custom chart script not running / payload_json error" | **C** |
 | "Fixed card misaligned / overlay leaks across routes" | **C** |
 | "What's the first arg of renderChart actually?" | **C** |
@@ -266,9 +269,10 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 - **[zhengyuhe123/guandata](https://github.com/zhengyuhe123/guandata)** — Original guandata GitHub project
 - **小小郑3号 · guandata70** — Guandata 7.0+ adapter (draft/release mechanism), the direct predecessor of Part A
 - **CTO Zhang Jin (张进, Guandata BI)** — Core contributor of Part B-17 (SmartETL full-chain rewrite methodology) and Part C (custom chart dev & debugging)
+- **OpenAI Codex** — V1.2 borrows the [ExecPlan specification](./references/execplan-spec.md) (self-contained living docs + four-section project management structure), used to track multi-day, 30+ table SmartETL rewrite engineering work
 - **maojiebc (马甲)** — Part A/B integration and 60+ ETL write empirical records
 
-> Without the open-source spirit of ClawHub / Zhang Jin / Xiao Xiao Zheng 3hao, this skill wouldn't exist.
+> Without the open-source spirit of ClawHub / Zhang Jin / Xiao Xiao Zheng 3hao / OpenAI Codex, this skill wouldn't exist.
 
 ---
 
@@ -276,6 +280,7 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 
 Full changelog in [SKILL.md version record](./SKILL.md#-版本记录).
 
+- **V1.2** (2026-05-09) — Adopted OpenAI Codex's ExecPlan spec; added B-17.11 (SmartETL-tailored ExecPlan skeleton + four-section workflow), B-12 engineering pointer; references/ adds execplan-spec.md + agents-rule.md
 - **V1.1** (2026-05-09) — Integrated CTO Zhang Jin's two experience docs: B-17 full-chain rewrite methodology + Part C custom chart
 - **V1.0** (2026-05-09) — Renamed `guandata70` → `guanyuan-majia`, added Part B: full ETL governance & write guide
 - **V0.x** (2026-03-30) — guandata70 initial version (by 小小郑3号), Guandata BI 7.0+ adapter
