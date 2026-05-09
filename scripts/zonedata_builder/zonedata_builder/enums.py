@@ -1,0 +1,160 @@
+"""
+enums.py
+所有枚举类型定义
+"""
+
+from enum import Enum
+
+
+class DataType(str, Enum):
+    """数据类型枚举（复刻 367588.t9）"""
+    INT = "INT"
+    DOUBLE = "DOUBLE"
+    STRING = "STRING"
+    TIMESTAMP = "TIMESTAMP"
+    LONG = "LONG"
+    SHORT = "SHORT"
+    FLOAT = "FLOAT"
+    DATE = "DATE"
+    SUB_DATE = "SUB_DATE"
+    BOOL = "BOOL"
+    DECIMAL = "DECIMAL"
+
+
+class DataTypeGroup(str, Enum):
+    """数据类型分组（复刻 367588.p8）"""
+    NUMBER = "NUMBER"
+    STRING = "STRING"
+    DATE = "DATE"
+    BOOL = "BOOL"
+
+
+class MetaType(str, Enum):
+    """元类型（复刻 241942.ZP）"""
+    DIM = "DIM"
+    METRIC = "METRIC"
+    MPH = "MPH"
+    UNKNOWN = "UNKNOWN"
+
+
+class AggrType(str, Enum):
+    """聚合类型（复刻 575534）"""
+    NUL = "NUL"
+    SUM = "SUM"
+    MIN = "MIN"
+    MAX = "MAX"
+    AVG = "AVG"
+    CNT = "CNT"
+    CNT_DISTINCT = "CNT_DISTINCT"
+    STDDEV = "STDDEV"
+    VAR = "VAR"
+    MED = "MED"
+    PERCENTILE = "PERCENTILE"
+
+
+class ZoneType(str, Enum):
+    """Zone类型（复刻 313759.ZP）"""
+    ROW = "row"
+    COLUMN = "column"
+    METRIC = "metric"
+    METRIC_ADDITIONAL = "metric_additional"
+    FILTER = "filters"
+    SORT = "sorting"
+    COLOR_BY = "colorBy"
+    SIZE_BY = "sizeBy"
+    TOOLTIP = "tooltip"
+    SPLIT = "split"
+
+
+class ZoneSpecialType(str, Enum):
+    """Zone特殊类型（复刻 313759.qx）"""
+    GEO = "geo"
+    SUB_METRIC = "sub_metric"
+    MAIN_METRIC = "main_metric"
+    METRIC_GROUP = "METRIC_GROUP"
+    MAIN_VICE = "MAIN_VICE"
+    DYNAMIC_ZONE = "DYNAMIC_ZONE"
+    DRILL = "DRILL"
+
+
+class ChartType(str, Enum):
+    """图表类型（复刻 387409.ZP）"""
+    # 柱状图
+    BASIC_COLUMN = "BASIC_COLUMN"
+    GROUPED_COLUMN = "GROUPED_COLUMN"
+    STACKED_COLUMN = "STACKED_COLUMN"
+    STACKED_SPLIT_COLUMN = "STACKED_SPLIT_COLUMN"
+    PERCENT_STACKED_COLUMN = "PERCENT_STACKED_COLUMN"
+    GROUPED_COLUMN_WITH_LINE = "GROUPED_COLUMN_WITH_LINE"
+    STACKED_COLUMN_WITH_LINE = "STACKED_COLUMN_WITH_LINE"
+    GROUPED_COLUMN_WITH_SYMBOL = "GROUPED_COLUMN_WITH_SYMBOL"
+    STACKED_COLUMN_WITH_SYMBOL = "STACKED_COLUMN_WITH_SYMBOL"
+    WATERFALL_COLUMN = "WATERFALL_COLUMN"
+    PARETO = "PARETO"
+    BULLET_COLUMN = "BULLET_COLUMN"
+    
+    # 条形图
+    BASIC_BAR = "BASIC_BAR"
+    GROUPED_BAR = "GROUPED_BAR"
+    STACKED_BAR = "STACKED_BAR"
+    STACKED_SPLIT_BAR = "STACKED_SPLIT_BAR"
+    PERCENT_STACKED_BAR = "PERCENT_STACKED_BAR"
+    BULLET_BAR = "BULLET_BAR"
+    BUTTERFLY = "BUTTERFLY"
+    
+    # 折线与面积
+    BASIC_LINE = "BASIC_LINE"
+    MULTI_LINE = "MULTI_LINE"
+    STACKED_AREA = "STACKED_AREA"
+    PERCENT_STACKED_AREA = "PERCENT_STACKED_AREA"
+    
+    # 饼图与漏斗
+    PIE = "PIE"
+    RISING_SUN = "RISING_SUN"
+    FUNNEL = "FUNNEL"
+    HORIZONTAL_FUNNEL = "HORIZONTAL_FUNNEL"
+    
+    # 地图
+    WORLD_MAP_BASIC = "WORLD_MAP_BASIC"
+    CHINA_MAP_BASIC = "CHINA_MAP_BASIC"
+    CHINA_MAP_WITH_BUBBLE = "CHINA_MAP_WITH_BUBBLE"
+    CHINA_MAP_WITH_SYMBOL = "CHINA_MAP_WITH_SYMBOL"
+    BAIDU_HEAT_MAP = "BAIDU_HEAT_MAP"
+    BAIDU_MAP_WITH_SYMBOL = "BAIDU_MAP_WITH_SYMBOL"
+    BAIDU_MIGRATION_MAP = "BAIDU_MIGRATION_MAP"
+    
+    # 指标与进度
+    SOLID_GAUGE = "SOLID_GAUGE"
+    SINGLE_VALUE = "SINGLE_VALUE"
+    PROGRESS_BAR = "PROGRESS_BAR"
+    PROGRESS_PIE = "PROGRESS_PIE"
+    LIQUID_GAUGE = "LIQUID_GAUGE"
+    ACTIVITY_GAUGE = "ACTIVITY_GAUGE"
+    KPI_CARD = "KPI_CARD"
+    KPI_TREND = "KPI_TREND"
+    
+    # 气泡与散点
+    BASIC_BUBBLE = "BASIC_BUBBLE"
+    BASIC_SCATTER_PLOT = "BASIC_SCATTER_PLOT"
+    
+    # 表格
+    PIVOT_TABLE = "PIVOT_TABLE"
+    DATA_GRID = "DATA_GRID"
+    DETAIL_TABLE = "DETAIL_TABLE"
+    GROUPED_TABLE = "GROUPED_TABLE"
+    SCROLL_TABLE = "SCROLL_TABLE"
+    HEAT_MAP = "HEAT_MAP"
+    
+    # 其他
+    WORDCLOUD = "WORDCLOUD"
+    RADAR_LINE = "RADAR_LINE"
+    TREEMAP = "TREEMAP"
+    MULTI_DIMENSION_SANKEY = "MULTI_DIMENSION_SANKEY"
+    SANKEY = "SANKEY"
+    CALENDAR_VIEW = "CALENDAR_VIEW"
+    BOX_PLOT = "BOX_PLOT"
+    YT_INDOOR_MAP = "YT_INDOOR_MAP"
+    FN_INDOOR_MAP = "FN_INDOOR_MAP"
+    SURFACE_MAP = "SURFACE_MAP"
+    ITEMVIEW = "ITEMVIEW"
+    DUMBBELL_PLOT = "DUMBBELL_PLOT"

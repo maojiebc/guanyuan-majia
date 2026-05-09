@@ -1,0 +1,9 @@
+{
+  "version": "6",
+  "base_url": "https://your-bi-instance.example.com/",
+  "domain": "guanbi",
+  "login_id": "your_username@example.com",
+  "password": "your_password_here",
+  "default_pg_id": "your_default_page_id",
+  "default_folder_id": "your_default_folder_id"
+}

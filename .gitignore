@@ -1,0 +1,29 @@
+# 凭据 — 绝对不能上传 / Credentials — never commit
+config.json
+.config.local.json
+
+# 缓存数据 / Cache data
+.cache/
+data/columns_cache/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# vim swap files
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Editor
+.vscode/
+.idea/
+*.iml
