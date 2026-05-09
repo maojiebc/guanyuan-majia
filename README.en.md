@@ -4,8 +4,8 @@
 > Compatible with **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** and any agent that recognizes `SKILL.md` frontmatter.
 > Battle-tested with 60+ ETL create/refactor/repair operations + governance scans + custom chart injection debugging.
 
-[![npm](https://img.shields.io/npm/v/@supermajia/guanyuan-bi?label=npm&color=cb3837)](https://www.npmjs.com/package/@supermajia/guanyuan-bi)
-[![Skill Version](https://img.shields.io/badge/skill-v1.5.0-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v1.5.1-blue)](./SKILL.md)
+[![GitHub Release](https://img.shields.io/github/v/release/maojiebc/guanyuan-majia?label=release&color=success)](https://github.com/maojiebc/guanyuan-majia/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-✓-orange)](https://docs.claude.com/en/docs/claude-code/skills)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-✓-blueviolet)](https://docs.openclaw.ai/tools/skills)
@@ -105,38 +105,41 @@ This skill is **tool-agnostic**. Any agent that supports the `SKILL.md` frontmat
 
 ## 📦 Installation
 
-### ⭐ Option 1: One-line `npx` install (recommended)
+> **This repo uses git as the single source of truth** — not published to the npm registry. The one-line install experience is preserved via `node bin/install.js` and `npx github:` directly.
+
+### ⭐ Option 1: Clone + built-in install CLI (recommended)
 
 ```bash
-# Auto-detect installed agent tools on this machine, install to all of them
-npx @supermajia/guanyuan-bi install
-
-# Or target a specific tool
-npx @supermajia/guanyuan-bi install --tool claude-code
-npx @supermajia/guanyuan-bi install --tool openclaw
-npx @supermajia/guanyuan-bi install --tool codex
-npx @supermajia/guanyuan-bi install --tool hermes
-npx @supermajia/guanyuan-bi install --tool all       # all four
+# Clone, then auto-install to every agent tool present on this machine
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/guanyuan-majia
+cd ~/guanyuan-majia
+node bin/install.js install                  # auto-detect all
+node bin/install.js install --tool claude-code
+node bin/install.js install --tool openclaw
+node bin/install.js install --tool codex
+node bin/install.js install --tool hermes
+node bin/install.js install --tool all       # all four
 
 # Other commands
-npx @supermajia/guanyuan-bi list                     # show current install state
-npx @supermajia/guanyuan-bi uninstall --tool codex   # remove (auto-backs-up your config.json)
+node bin/install.js list                     # show current install state
+node bin/install.js uninstall --tool codex   # remove (auto-backs-up your config.json)
 ```
 
-**Behavior**:
+### Option 2: `npx` from GitHub URL (no clone required)
+
+```bash
+# One-liner; npx fetches from GitHub and runs bin/install.js
+npx github:maojiebc/guanyuan-majia install --tool claude-code
+npx github:maojiebc/guanyuan-majia install --tool all
+```
+
+**`bin/install.js` behavior** (same for both options):
 - Copies `SKILL.md` / `AGENTS.md` / `manifest.json` / `scripts/` / `references/` into the target tool's skills directory
 - Seeds `config.json` from `config.example.json` and prompts you to edit it
 - **Never overwrites your existing `config.json`** (real credentials are preserved across reinstalls)
 - Skips already-installed targets by default; use `--force` to overwrite
 
-You can also install globally:
-
-```bash
-npm install -g @supermajia/guanyuan-bi
-guanyuan-bi install --tool all
-```
-
-### Option 2: Manual `git clone` (no npm dependency)
+### Option 3: Manual `git clone` directly into the tool's skill directory
 
 ```bash
 # Claude Code
@@ -363,8 +366,9 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 
 Full changelog in [SKILL.md version record](./SKILL.md#-版本记录).
 
+- **V1.5.1** (2026-05-09) — 🪶 npm path simplified. Repo uses **git as the single source of truth**, not published to npm registry. The `bin/install.js` CLI experience is preserved; entry point switches from `npx @supermajia/guanyuan-bi` to `node bin/install.js` or `npx github:maojiebc/guanyuan-majia install` (npx natively supports GitHub URLs without npm registry). `package.json` / `manifest.json` / `.npmignore` retained as runtime metadata for the local install CLI; reusable should npm publishing be revived later.
 - **V1.5.0** (2026-05-09) — 🏗️ Progressive Disclosure refactor. `SKILL.md` shrunk from 2087 lines (89KB) to 913 lines (48KB), saving ~12K tokens per skill invocation. High-frequency content (Part router, decision framework, key APIs, error quick-ref, redlines, ID lookup) stays in the main doc; detailed playbooks moved into 8 new `references/` files (part-a-commands / part-a-cards / part-b-errors / part-b-payload / part-b-sdk / part-b17-fullchain-rewrite / part-c-payload-json / guancli-commands). Performance unchanged, zero content loss.
-- **V1.4.0** (2026-05-09) — 📦 npm-packaged. Published [`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi) to npm registry. Added `bin/install.js` with built-in CLI (`install` / `list` / `uninstall` commands) that auto-detects Claude Code / OpenClaw / Codex / Hermes and never overwrites the user's `config.json`. One-line install: `npx @supermajia/guanyuan-bi install`.
+- **V1.4.0** (2026-05-09) — 🛠️ Cross-tool install CLI added. New `bin/install.js` with `install` / `list` / `uninstall` commands (plus `--tool` / `--force` / `--dry-run` flags) auto-detects Claude Code / OpenClaw / Codex / Hermes and installs/upgrades into each, never overwriting the user's `config.json`. `package.json` / `.npmignore` shipped as packaging metadata (clarified to be local-only in V1.5.1).
 - **V1.3.1** (2026-05-09) — External code review patch: closed unclosed bash fence in SKILL.md; added **B-7.0 hard safety gate** requiring explicit per-item user confirmation before any DELETE; sanitized `--task` input in `scripts/guandata.py` to block path traversal (`../`, reserved `.` / `..`); aligned frontmatter description version number.
 - **V1.3** (2026-05-09) — Tool-agnostic. Native support for Claude Code / OpenClaw / Codex / Hermes (gbrain). Added repo-root `AGENTS.md` (Codex project instructions + Hermes resolver) and `manifest.json` (tool-agnostic metadata); removed all `~/.claude/skills/` hardcoded paths; README adds Compatibility section listing per-tool install commands.
 - **V1.2** (2026-05-09) — Adopted OpenAI Codex's ExecPlan spec; added B-17.11 (SmartETL-tailored ExecPlan skeleton + four-section workflow), B-12 engineering pointer; references/ adds execplan-spec.md + agents-rule.md

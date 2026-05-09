@@ -58,8 +58,9 @@ This skill is built on top of multiple predecessors and contributions from the G
   - V1.1 整合 CTO 张进经验
   - V1.2 整合 OpenAI Codex ExecPlan 规范并定制化为 SmartETL 重写场景骨架
   - V1.3 工具无关化：新增 `AGENTS.md` + `manifest.json`，去硬编码路径，原生兼容 Claude Code / OpenClaw / Codex / Hermes (gbrain)
-  - V1.4.0 npm 包化：发布 `@supermajia/guanyuan-bi` 到 npm registry，写 `bin/install.js`（`install` / `list` / `uninstall`），一行 `npx @supermajia/guanyuan-bi install` 装到任意 agent 工具
+  - V1.4.0 跨工具 install CLI：写 `bin/install.js`（`install` / `list` / `uninstall`），一行装到任意 agent 工具
   - V1.5.0 progressive disclosure 重构：SKILL.md 从 2087 行（89KB）压到 913 行（48KB），单次触发省 ~1.2 万 token；高频内容留主文档，详细操作手册下沉到 `references/` 8 个新蒸馏版（与贡献者原文区分）
+  - V1.5.1 npm 路线精简：明确以 git 为唯一 source of truth，不发布 npm；保留 `node bin/install.js` + `npx github:` 两条一行装入口
   - 所有文档双语化（中文 / 英文）
   - 公开发布到 GitHub
 

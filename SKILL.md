@@ -1,10 +1,10 @@
 ---
 name: guanyuan-majia
 description: 观远 BI（Guandata）全链路操作 — 数据查询/建卡/取数（Part A）、ETL 治理/写入/删除（Part B，含 SmartETL 全链路重写 + 字段使用度审计 + ExecPlan 工程化）、自定义图表 HTML/CSS/JS 注入与排障（Part C）。当用户提到 营业额/门店/会员/订单/建卡/取数/报表/ETL/direct-save/payload_json/自定义图表/观远/Guandata/BI 时使用。马甲业务实战版，60+ ETL 战例、10 类报错手册、Claude Code/OpenClaw/Codex/Hermes 通用。
-version: "1.5.0"
+version: "1.5.1"
 ---
 
-# 观远 BI · 马甲专版（V1.5.0）
+# 观远 BI · 马甲专版（V1.5.1）
 
 > **结构说明（V1.5.0 引入 progressive disclosure）**：本文档是**路由层 + 关键规则**，详细操作手册下沉到 `references/`。每个 Part 的入口章节会指出"何时回到 references/ 查全表"。完整章节索引见末尾的 [📚 References 目录](#-references-目录)。
 
@@ -20,7 +20,7 @@ version: "1.5.0"
 | 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读各 Part 章节末尾的"实战 ID 速查" |
 
 > **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）+ OpenAI Codex（V1.2 ExecPlan 规范）
-> **版本**：V1.5.0（2026-05-09）· **npm 包**：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi)（一行 `npx @supermajia/guanyuan-bi install`）· **作用域**：本地私有 BI 实例
+> **版本**：V1.5.1（2026-05-09）· **安装**：`git clone` + `node bin/install.js install`，或 `npx github:maojiebc/guanyuan-majia install`（不依赖 npm registry）· **作用域**：本地私有 BI 实例
 > **兼容工具**：Claude Code · OpenClaw · Codex · Hermes (gbrain) · 任何支持 `SKILL.md` frontmatter 的 agent。详见仓库根 [README · 兼容性](README.md#-兼容性--compatibility) 与 [AGENTS.md](AGENTS.md)。
 
 ---
@@ -907,19 +907,25 @@ new GDPlugin().init(renderChart);
   - ❌ **删除冗余**：原 B-16 / C-10 "触发场景示例"两节删除（重复 description 信息，反 progressive disclosure）。
   - ✏️ **修正 V1.3.1 之前已知小毛病**：原 L28 "操作前必读"标题为空 + L30 立即出现"关键规则"标题这种结构噪声合并清理。
   - ⚠️ **manifest.json 的 `triggers` 字段标记为遗留**：Claude Code/OpenClaw/Codex 三个目标 agent 实际只读 SKILL.md frontmatter `description`，manifest.triggers 维护成本不带来对应收益。本版保留字段不删（避免破坏 schema 期望），但在字段后加注释说明"see SKILL.md description for the single source of truth"。
-  - 🔗 **基于 V1.4.0 npm 化**：保留并整合 V1.4.0 引入的 npm 包链接、`bin/install.js` 安装器、`package.json` 等基础设施；package.json `version` 同步升至 1.5.0 并随 npm publish 一起发出。
-- **V1.4.0** (2026-05-09)：npm package 化 — 现在可以一行 `npx` 安装到任意 agent 工具。
-  - 📦 发布到 npm registry：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi)
-  - 🚀 一行安装：`npx @supermajia/guanyuan-bi install` 自动检测当前机器上已装的 4 个 agent 工具并全部安装
-  - 🛠️ 内置 CLI（`guanyuan-bi` / `supermajia-guanyuan`）：
+  - 🔗 **基于 V1.4.0 install CLI**：保留并整合 V1.4.0 引入的 `bin/install.js` 安装器、`package.json` 等基础设施。
+- **V1.5.1** (2026-05-09)：🪶 npm 路线精简 — git 唯一 source of truth。
+  - 决策：本仓库**不发布到 npm registry**。理由：作为 agent skill，git clone 体验已足够顺，npm publish 是双 source of truth 维护负担（V1.4.0 hand-off 步骤一直没真发，README 命令实际跑会 404，已经踩到一次坑）。
+  - 一行装的体验**保留**，入口换两条更稳的路径：
+    - `git clone` + `node bin/install.js install`（主推，离线可控）
+    - `npx github:maojiebc/guanyuan-majia install`（备选，npx 原生支持 GitHub URL，**不依赖 npm registry**）
+  - 删除对外 npm 入口：README 顶部 npm badge 移除，安装段落不再出现 `@supermajia/guanyuan-bi`。
+  - **保留** `package.json` / `manifest.json` / `.npmignore` / `bin/install.js` —— 它们是本地 install CLI 的运行时元数据，将来若要再发 npm 不必重写。
+  - 同步 bump：`package.json` / `manifest.json` / SKILL.md frontmatter 都升 1.5.1。
+- **V1.4.0** (2026-05-09)：🛠️ 添加跨工具 install CLI。
+  - 新增 `bin/install.js`（10.9KB Node.js 安装器），三命令：
     - `install [--tool claude-code|openclaw|codex|hermes|all] [--force] [--dry-run]`
     - `list` 列出当前安装情况 + 每个工具的版本
     - `uninstall --tool <name>`（自动备份用户已修改过的 `config.json` 到 `.backup`）
   - 🛡️ 安全约束：
     - **永远不覆盖已存在的 `config.json`**（保留真凭据，再装一次也不丢）
     - 默认跳过已装目标，要 `--force` 才覆盖
-    - 排除 `.cache/` / `data/columns_cache/` / `.git/` 不进 npm tarball（`.npmignore` 三重保险 + `package.json files` 白名单 + dry-run 验证）
-  - 📁 新增文件：`package.json` / `bin/install.js`（10.9KB Node.js 安装器）/ `.npmignore`
+    - 排除 `.cache/` / `data/columns_cache/` / `.git/` 不进 tarball（`.npmignore` + `package.json files` 白名单 + dry-run 验证）
+  - 📁 新增文件：`package.json` / `bin/install.js` / `.npmignore`（V1.5.1 后明确仅本地用，不 publish）
 - **V1.3.1** (2026-05-09)：基于外部代码审查的修复版本（patch release，无新功能）。
   - 🐛 **P1 修复**：SKILL.md L185 附近 ` ```bash ` 代码块未闭合 ——补上关闭 fence，确保后续 Markdown 结构不错位。
   - 🛡️ **P2 安全**：新增 **B-7.0 删除前的硬性安全闸** —— Agent 在执行任何 `DELETE /api/data-source/` 或 `DELETE /api/etl/` 前必须满足四条硬约束（用户逐项明确确认 / 下游引用已切流 / 新链路对账通过 / 批量分批确认）。Agent 默认行为是产出待删清单供用户审阅，永远不主动删除。B-13 红线同步加一条最显眼的"未经用户逐项明确确认，绝不执行任何 DELETE 操作"。

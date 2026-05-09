@@ -162,7 +162,7 @@ function cmdVersion() {
 }
 
 function cmdList() {
-  log('Skill installations of @supermajia/guanyuan-bi:\n');
+  log(`Skill installations of ${SKILL_NAME}:\n`);
   for (const [key, t] of Object.entries(TOOLS)) {
     if (fs.existsSync(t.installPath)) {
       const skillMd = path.join(t.installPath, 'SKILL.md');
@@ -199,7 +199,7 @@ function resolveTargets(toolArg) {
 
 function cmdInstall(args) {
   const targets = resolveTargets(args.tool);
-  log(`Installing @supermajia/guanyuan-bi to: ${targets.join(', ')}\n`);
+  log(`Installing ${SKILL_NAME} to: ${targets.join(', ')}\n`);
   if (args.dryRun) warn('DRY-RUN mode: no files will be modified.\n');
 
   let installed = 0;
