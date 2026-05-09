@@ -189,6 +189,8 @@ openclaw skills install guanyuan-majia
 clawhub install guanyuan-majia
 ```
 
+> ClawHub may show a security scan warning: this skill includes a local Python client that encodes the BI login credential as required by the Guandata API and sends it only to the user-configured `base_url`. Before installing from registries, review [SECURITY.md](./SECURITY.md) and inspect [scripts/guandata.py](./scripts/guandata.py).
+
 ### Option 5: Hermes skillpack install (if published to gbrain registry)
 
 ```bash

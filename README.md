@@ -188,6 +188,8 @@ openclaw skills install guanyuan-majia
 clawhub install guanyuan-majia
 ```
 
+> ClawHub 可能显示安全扫描提醒：本 skill 包含一个本地 Python 客户端，会按观远接口要求把登录凭据编码后发送到用户自己配置的 `base_url`。安装前可先阅读 [SECURITY.md](./SECURITY.md) 并检查 [scripts/guandata.py](./scripts/guandata.py)。
+
 ### 方式 5：Hermes skillpack 安装（如发布到 gbrain registry）
 
 ```bash
