@@ -57,6 +57,7 @@ This skill is built on top of multiple predecessors and contributions from the G
   - **Part B ETL 治理与写入实证** — 60+ 张 ETL 创建/重构/修复的真实战场记录，包括 11 个已实测 BI HTTP API endpoint、8 维 ETL + 4 维字段去留判断、ODS/DIM/DWD/DWS/APP 五层分层、字段使用度双源审计（page+etl）、v2→v3 批量改造 SDK、10 类高频报错修复手册
   - V1.1 整合 CTO 张进经验
   - V1.2 整合 OpenAI Codex ExecPlan 规范并定制化为 SmartETL 重写场景骨架
+  - V1.3 工具无关化：新增 `AGENTS.md` + `manifest.json`，去硬编码路径，原生兼容 Claude Code / OpenClaw / Codex / Hermes (gbrain)
   - 所有文档双语化（中文 / 英文）
   - 公开发布到 GitHub
 

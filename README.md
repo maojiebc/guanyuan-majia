@@ -1,11 +1,15 @@
-# guanyuan-majia · 观远 BI 马甲专版 Skill
+# guanyuan-majia · 观远 BI 通用 Agent Skill
 
-> Claude Code Skill for **观远 BI / Guandata** — 数据查询 / ETL 治理与写入 / 自定义图表开发，**全栈三合一**。
+> **工具无关**的观远 BI / Guandata Agent Skill — 数据查询 / ETL 治理与写入 / 自定义图表开发，**全栈三合一**。
+> 兼容 **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** 等所有支持 SKILL.md 的 agent 工具。
 > 60+ 张 ETL 创建/重构/修复 + 治理扫描 + 自定义图表注入排障的真实战场记录。
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v1.3-blue)](./SKILL.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
-[![Claude Code](https://img.shields.io/badge/Claude_Code-Skill-orange)](https://docs.claude.com/en/docs/claude-code/skills)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-✓-orange)](https://docs.claude.com/en/docs/claude-code/skills)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-✓-blueviolet)](https://docs.openclaw.ai/tools/skills)
+[![Codex](https://img.shields.io/badge/Codex-✓-black)](https://developers.openai.com/codex/skills)
+[![Hermes](https://img.shields.io/badge/Hermes_(gbrain)-✓-darkgreen)](https://github.com/garrytan/gbrain)
 [![BI](https://img.shields.io/badge/Guandata-BI_6.x_/_7.x-purple)](https://www.guandata.com/)
 
 **[English README](README.en.md)** · 中文文档 ↓
@@ -84,28 +88,63 @@
 
 ---
 
+## 🔌 兼容性 / Compatibility
+
+本 skill **工具无关**，凡是支持 `SKILL.md` frontmatter 标准的 agent 都能加载。已在以下工具上验证：
+
+| 工具 | 状态 | 安装路径 | 入口文件 | 备注 |
+|---|:---:|---|---|---|
+| **Claude Code** | ✅ 已验证 | `~/.claude/skills/guanyuan-majia/` | `SKILL.md` | 原生支持 |
+| **OpenClaw** | ✅ 已验证 | `~/.openclaw/skills/guanyuan-majia/` 或 `<workspace>/skills/guanyuan-majia/` | `SKILL.md` | 大小写敏感 |
+| **Codex (OpenAI)** | ✅ 已验证 | `~/.codex/skills/guanyuan-majia/` 或 `<repo>/.codex/skills/guanyuan-majia/` | `SKILL.md` + 仓库根 `AGENTS.md`（项目指令） | 见 [Codex skills docs](https://developers.openai.com/codex/skills) |
+| **Hermes / gbrain** | ✅ 已验证 | `<workspace>/skills/guanyuan-majia/` | `SKILL.md` + 仓库根 `AGENTS.md`（resolver） | 见 [garrytan/gbrain](https://github.com/garrytan/gbrain) |
+| **Cursor / Aider** 等 AGENTS.md-aware | 🟡 理论兼容 | 任意 | `AGENTS.md` 作项目指令 | 仅会用到 Part A/B/C 的 navigation pointer |
+| 其他 | 🟡 通用清单 | 任意 | `manifest.json` 作工具无关元数据 | frontmatter + manifest 双保险 |
+
 ## 📦 安装
 
-### 方式 1：克隆到 Claude Code skills 目录（推荐）
+### 方式 1：克隆到对应工具的 skill 目录
 
 ```bash
-cd ~/.claude/skills
-git clone https://github.com/maojiebc/guanyuan-majia.git
-cd guanyuan-majia
+# Claude Code
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/.claude/skills/guanyuan-majia
+
+# OpenClaw（个人级）
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/.openclaw/skills/guanyuan-majia
+
+# Codex（个人级）
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/.codex/skills/guanyuan-majia
+
+# Codex（项目级）
+git clone https://github.com/maojiebc/guanyuan-majia.git <your-repo>/.codex/skills/guanyuan-majia
+
+# Hermes / gbrain（workspace 级）
+git clone https://github.com/maojiebc/guanyuan-majia.git <your-workspace>/skills/guanyuan-majia
+```
+
+然后配置凭据（所有工具相同）：
+
+```bash
+cd <安装路径>
 cp config.example.json config.json
-# 编辑 config.json 填入 BI 凭据
-vim config.json
+vim config.json  # 填入 BI base_url / login_id / password / default_pg_id / default_folder_id
 ```
 
-### 方式 2：手动放置到任意 skill 加载路径
+### 方式 2：OpenClaw 一键安装（如可用）
+
+如果你在 ClawHub 看到 `guanyuan-majia`：
 
 ```bash
-git clone https://github.com/maojiebc/guanyuan-majia.git
-# 放到任何 Claude Code 会扫描的 skill 目录，例如：
-mv guanyuan-majia /path/to/your/skills/
+openclaw skills install guanyuan-majia
 ```
 
-### 依赖
+### 方式 3：Hermes skillpack 安装（如可用）
+
+```bash
+gbrain skillpack install guanyuan-majia
+```
+
+### 依赖（所有工具相同）
 
 ```bash
 # Python 依赖（Part A）
@@ -153,7 +192,10 @@ guancli auth login   # 配置 BI 登录
 ### Part A：建卡取数（数据分析）
 
 ```bash
-SCRIPT="python3 ~/.claude/skills/guanyuan-majia/scripts/guandata.py"
+# cwd 切到 skill 安装目录，所有命令用相对路径
+cd <skill_install_path>  # 例如 ~/.claude/skills/guanyuan-majia/
+
+SCRIPT="python3 ./scripts/guandata.py"
 
 # 1. 列数据集
 $SCRIPT list-datasets
@@ -217,7 +259,9 @@ new GDPlugin().init(renderChart);
 
 ```text
 guanyuan-majia/
-├── SKILL.md                          # AI 读的主文档（Part A + B + C，1968 行）
+├── SKILL.md                          # AI 读的主文档（Part A + B + C）
+├── AGENTS.md                         # Codex 项目指令 / Hermes resolver（V1.3 新增）
+├── manifest.json                     # 工具无关 skill 元数据（V1.3 新增）
 ├── README.md                         # 本文件（中文）
 ├── README.en.md                      # English README
 ├── ATTRIBUTIONS.md                   # 致谢与来源
@@ -231,8 +275,8 @@ guanyuan-majia/
 └── references/                       # 深度参考资料
     ├── custom-chart-playbook.md      # CTO 张进自定义图表完整排障手册原文
     ├── etl-rewrite-original.md       # CTO 张进 SmartETL 改写经验原文
-    ├── execplan-spec.md              # OpenAI Codex ExecPlan 规范（V1.2 新增）
-    └── agents-rule.md                # OpenAI Codex 极简调度规则（V1.2 新增）
+    ├── execplan-spec.md              # OpenAI Codex ExecPlan 规范（V1.2）
+    └── agents-rule.md                # OpenAI Codex 极简调度规则（V1.2）
 ```
 
 ---
@@ -279,6 +323,7 @@ guanyuan-majia/
 
 完整变更历史见 [SKILL.md 末尾的版本记录](./SKILL.md#-版本记录)。
 
+- **V1.3** (2026-05-09) — 工具无关化。原生兼容 Claude Code / OpenClaw / Codex / Hermes (gbrain)。新增仓库根 `AGENTS.md`（Codex 项目指令 + Hermes resolver）+ `manifest.json`（工具无关元数据）；去掉所有 `~/.claude/skills/` 类硬编码路径；README 加 Compatibility 章节列出每工具安装命令。
 - **V1.2** (2026-05-09) — 吸收 OpenAI Codex 的 ExecPlan 规范，新增 B-17.11 用 ExecPlan 管理重写工程（SmartETL 改写专用骨架 + 四个活文档章节实战用法）+ B-12 工程化指针；`references/` 加 execplan-spec.md + agents-rule.md
 - **V1.1** (2026-05-09) — 整合 CTO 张进的两份经验：B-17 全链路重写方法论 + Part C 自定义图表
 - **V1.0** (2026-05-09) — 重命名 `guandata70` → `guanyuan-majia`，新增 Part B：ETL 治理与写入完整指南

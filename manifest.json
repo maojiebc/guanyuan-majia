@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json.schemastore.org/skill-manifest",
+  "name": "guanyuan-majia",
+  "displayName": "Guanyuan-Majia · Guandata BI Skill",
+  "version": "1.3.0",
+  "description": "Tool-agnostic Claude Code / OpenClaw / Codex / Hermes skill for Guandata BI (观远 BI). Three capabilities: data query & card creation (Part A), ETL governance & write (Part B), custom chart dev & debugging (Part C). Battle-tested with 60+ ETL operations.",
+  "license": "MIT",
+  "author": "maojiebc",
+  "homepage": "https://github.com/maojiebc/guanyuan-majia",
+  "repository": "https://github.com/maojiebc/guanyuan-majia",
+  "entry": "SKILL.md",
+  "compatibility": {
+    "claude-code": {
+      "supported": true,
+      "installPath": "~/.claude/skills/guanyuan-majia/",
+      "entry": "SKILL.md"
+    },
+    "openclaw": {
+      "supported": true,
+      "installPath": "~/.openclaw/skills/guanyuan-majia/",
+      "entry": "SKILL.md"
+    },
+    "codex": {
+      "supported": true,
+      "installPath": "~/.codex/skills/guanyuan-majia/",
+      "entry": "SKILL.md",
+      "projectInstructions": "AGENTS.md"
+    },
+    "hermes": {
+      "supported": true,
+      "installPath": "<workspace>/skills/guanyuan-majia/",
+      "entry": "SKILL.md",
+      "resolver": "AGENTS.md"
+    }
+  },
+  "triggers": {
+    "partA": [
+      "查数据", "做图表", "看报表", "营业额", "门店", "会员", "订单", "建卡", "取数", "删卡",
+      "create card", "fetch data", "make chart", "data analysis"
+    ],
+    "partB": [
+      "ETL 治理", "循环依赖", "字段使用度", "新建 ETL", "修改 ETL", "direct-save",
+      "ETL 报错", "execute 失败", "批量迁移 ETL", "BI HTTP API",
+      "ETL governance", "create ETL", "modify ETL", "ETL error", "BI API"
+    ],
+    "partB17": [
+      "SmartETL 改写", "全链路重写", "副本页验收", "差异追踪", "空快照",
+      "ExecPlan", "30+ 表迁移",
+      "SmartETL rewrite", "full-chain rewrite", "replica page verification",
+      "diff tracking", "empty snapshot"
+    ],
+    "partC": [
+      "自定义图表", "HTML 注入", "JS 注入", "payload_json", "overlay",
+      "固定卡片", "z-index", "renderChart",
+      "custom chart", "HTML injection", "JS injection", "fixed card"
+    ]
+  },
+  "dependencies": {
+    "system": ["jq", "bash"],
+    "python": ["httpx>=0.20"],
+    "node": ["@guandata/guancli@^1.0.18"]
+  },
+  "config": {
+    "template": "config.example.json",
+    "userFile": "config.json",
+    "gitignored": true,
+    "fields": ["base_url", "domain", "login_id", "password", "default_pg_id", "default_folder_id"]
+  },
+  "credits": {
+    "originalSkills": [
+      {
+        "name": "guandata-bi",
+        "url": "https://clawhub.ai/skills/guandata-bi",
+        "role": "Part A inspiration"
+      },
+      {
+        "name": "zhengyuhe123/guandata",
+        "url": "https://github.com/zhengyuhe123/guandata",
+        "role": "Original GitHub project"
+      },
+      {
+        "name": "guandata70",
+        "author": "小小郑3号",
+        "role": "Direct predecessor of Part A (Guandata 7.0+ adapter)"
+      }
+    ],
+    "experienceContributors": [
+      {
+        "name": "Zhang Jin (张进)",
+        "role": "CTO @ Guandata. Contributed Part B-17 (SmartETL full-chain rewrite methodology) and Part C (custom chart dev)"
+      },
+      {
+        "name": "OpenAI Codex",
+        "role": "Contributed ExecPlan specification used in B-17.11"
+      }
+    ]
+  }
+}

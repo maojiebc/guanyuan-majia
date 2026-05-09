@@ -1,11 +1,15 @@
-# guanyuan-majia · Claude Code Skill for Guandata BI
+# guanyuan-majia · Tool-Agnostic Agent Skill for Guandata BI
 
-> Claude Code Skill for **Guandata BI (观远 BI)** — Data analysis / ETL governance & write / Custom chart development, **all-in-one**.
+> **Tool-agnostic** Agent Skill for **Guandata BI (观远 BI)** — Data analysis / ETL governance & write / Custom chart development, **all-in-one**.
+> Compatible with **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** and any agent that recognizes `SKILL.md` frontmatter.
 > Battle-tested with 60+ ETL create/refactor/repair operations + governance scans + custom chart injection debugging.
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v1.3-blue)](./SKILL.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
-[![Claude Code](https://img.shields.io/badge/Claude_Code-Skill-orange)](https://docs.claude.com/en/docs/claude-code/skills)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-✓-orange)](https://docs.claude.com/en/docs/claude-code/skills)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-✓-blueviolet)](https://docs.openclaw.ai/tools/skills)
+[![Codex](https://img.shields.io/badge/Codex-✓-black)](https://developers.openai.com/codex/skills)
+[![Hermes](https://img.shields.io/badge/Hermes_(gbrain)-✓-darkgreen)](https://github.com/garrytan/gbrain)
 [![BI](https://img.shields.io/badge/Guandata-BI_6.x_/_7.x-purple)](https://www.guandata.com/)
 
 **[中文 README](README.md)** · English ↓
@@ -85,27 +89,61 @@ This Skill consolidates three categories of Guandata BI operations into **a sing
 
 ---
 
+## 🔌 Compatibility
+
+This skill is **tool-agnostic**. Any agent that supports the `SKILL.md` frontmatter standard can load it. Verified on:
+
+| Tool | Status | Install path | Entry | Notes |
+|---|:---:|---|---|---|
+| **Claude Code** | ✅ Verified | `~/.claude/skills/guanyuan-majia/` | `SKILL.md` | Native support |
+| **OpenClaw** | ✅ Verified | `~/.openclaw/skills/guanyuan-majia/` or `<workspace>/skills/guanyuan-majia/` | `SKILL.md` | Case-sensitive |
+| **Codex (OpenAI)** | ✅ Verified | `~/.codex/skills/guanyuan-majia/` or `<repo>/.codex/skills/guanyuan-majia/` | `SKILL.md` + repo-root `AGENTS.md` (project instructions) | See [Codex skills docs](https://developers.openai.com/codex/skills) |
+| **Hermes / gbrain** | ✅ Verified | `<workspace>/skills/guanyuan-majia/` | `SKILL.md` + repo-root `AGENTS.md` (resolver) | See [garrytan/gbrain](https://github.com/garrytan/gbrain) |
+| **Cursor / Aider** etc. | 🟡 Theoretical | Anywhere | `AGENTS.md` as project instructions | Only the navigation pointer parts apply |
+| Others | 🟡 Universal | Anywhere | `manifest.json` as tool-agnostic metadata | frontmatter + manifest dual fallback |
+
 ## 📦 Installation
 
-### Option 1: Clone into Claude Code skills directory (recommended)
+### Option 1: Clone into the target tool's skill directory
 
 ```bash
-cd ~/.claude/skills
-git clone https://github.com/maojiebc/guanyuan-majia.git
-cd guanyuan-majia
+# Claude Code
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/.claude/skills/guanyuan-majia
+
+# OpenClaw (personal)
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/.openclaw/skills/guanyuan-majia
+
+# Codex (personal)
+git clone https://github.com/maojiebc/guanyuan-majia.git ~/.codex/skills/guanyuan-majia
+
+# Codex (project-local)
+git clone https://github.com/maojiebc/guanyuan-majia.git <your-repo>/.codex/skills/guanyuan-majia
+
+# Hermes / gbrain (workspace-level)
+git clone https://github.com/maojiebc/guanyuan-majia.git <your-workspace>/skills/guanyuan-majia
+```
+
+Then configure credentials (same for all tools):
+
+```bash
+cd <install_path>
 cp config.example.json config.json
-# Edit config.json with your BI credentials
-vim config.json
+vim config.json  # fill in BI base_url / login_id / password / default_pg_id / default_folder_id
 ```
 
-### Option 2: Manual placement
+### Option 2: OpenClaw one-line install (if available on ClawHub)
 
 ```bash
-git clone https://github.com/maojiebc/guanyuan-majia.git
-mv guanyuan-majia /path/to/your/skills/
+openclaw skills install guanyuan-majia
 ```
 
-### Dependencies
+### Option 3: Hermes skillpack install (if available)
+
+```bash
+gbrain skillpack install guanyuan-majia
+```
+
+### Dependencies (same for all tools)
 
 ```bash
 # Python deps (Part A)
@@ -153,7 +191,10 @@ Copy `config.example.json` to `config.json` and fill in real credentials:
 ### Part A: Card creation & data fetch
 
 ```bash
-SCRIPT="python3 ~/.claude/skills/guanyuan-majia/scripts/guandata.py"
+# cwd = skill install dir, all paths are relative
+cd <install_path>  # e.g. ~/.claude/skills/guanyuan-majia/
+
+SCRIPT="python3 ./scripts/guandata.py"
 
 # 1. List datasets
 $SCRIPT list-datasets
@@ -218,7 +259,9 @@ new GDPlugin().init(renderChart);
 
 ```text
 guanyuan-majia/
-├── SKILL.md                          # Main doc for AI (Part A + B + C, 1968 lines)
+├── SKILL.md                          # Main doc for AI (Part A + B + C)
+├── AGENTS.md                         # Codex project instructions / Hermes resolver (V1.3)
+├── manifest.json                     # Tool-agnostic skill metadata (V1.3)
 ├── README.md                         # Chinese README
 ├── README.en.md                      # This file
 ├── ATTRIBUTIONS.md                   # Credits & sources
@@ -280,6 +323,7 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 
 Full changelog in [SKILL.md version record](./SKILL.md#-版本记录).
 
+- **V1.3** (2026-05-09) — Tool-agnostic. Native support for Claude Code / OpenClaw / Codex / Hermes (gbrain). Added repo-root `AGENTS.md` (Codex project instructions + Hermes resolver) and `manifest.json` (tool-agnostic metadata); removed all `~/.claude/skills/` hardcoded paths; README adds Compatibility section listing per-tool install commands.
 - **V1.2** (2026-05-09) — Adopted OpenAI Codex's ExecPlan spec; added B-17.11 (SmartETL-tailored ExecPlan skeleton + four-section workflow), B-12 engineering pointer; references/ adds execplan-spec.md + agents-rule.md
 - **V1.1** (2026-05-09) — Integrated CTO Zhang Jin's two experience docs: B-17 full-chain rewrite methodology + Part C custom chart
 - **V1.0** (2026-05-09) — Renamed `guandata70` → `guanyuan-majia`, added Part B: full ETL governance & write guide
