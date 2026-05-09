@@ -4,7 +4,8 @@
 > 兼容 **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** 等所有支持 SKILL.md 的 agent 工具。
 > 60+ 张 ETL 创建/重构/修复 + 治理扫描 + 自定义图表注入排障的真实战场记录。
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.3.1-blue)](./SKILL.md)
+[![npm](https://img.shields.io/npm/v/@supermajia/guanyuan-bi?label=npm&color=cb3837)](https://www.npmjs.com/package/@supermajia/guanyuan-bi)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.0-blue)](./SKILL.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-✓-orange)](https://docs.claude.com/en/docs/claude-code/skills)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-✓-blueviolet)](https://docs.openclaw.ai/tools/skills)
@@ -103,7 +104,38 @@
 
 ## 📦 安装
 
-### 方式 1：克隆到对应工具的 skill 目录
+### ⭐ 方式 1：一行 `npx` 安装（推荐）
+
+```bash
+# 自动检测当前机器上已装的 agent 工具，全部安装
+npx @supermajia/guanyuan-bi install
+
+# 或指定单个工具
+npx @supermajia/guanyuan-bi install --tool claude-code
+npx @supermajia/guanyuan-bi install --tool openclaw
+npx @supermajia/guanyuan-bi install --tool codex
+npx @supermajia/guanyuan-bi install --tool hermes
+npx @supermajia/guanyuan-bi install --tool all       # 4 个全装
+
+# 其他命令
+npx @supermajia/guanyuan-bi list                     # 列出当前安装情况
+npx @supermajia/guanyuan-bi uninstall --tool codex   # 移除（自动备份你的 config.json）
+```
+
+**脚本行为**：
+- 自动复制 `SKILL.md` / `AGENTS.md` / `manifest.json` / `scripts/` / `references/` 等到目标工具的 skill 目录
+- 自动 `cp config.example.json → config.json`，提示你编辑填凭据
+- **永远不覆盖你已有的 `config.json`**（保留真凭据，再装一次也不丢）
+- 已装时默认跳过，要 `--force` 才覆盖
+
+也可以装到全局命令再用：
+
+```bash
+npm install -g @supermajia/guanyuan-bi
+guanyuan-bi install --tool all
+```
+
+### 方式 2：手动 `git clone`（不依赖 npm）
 
 ```bash
 # Claude Code
@@ -130,15 +162,13 @@ cp config.example.json config.json
 vim config.json  # 填入 BI base_url / login_id / password / default_pg_id / default_folder_id
 ```
 
-### 方式 2：OpenClaw 一键安装（如可用）
-
-如果你在 ClawHub 看到 `guanyuan-majia`：
+### 方式 3：OpenClaw 一键安装（如发布到 ClawHub）
 
 ```bash
 openclaw skills install guanyuan-majia
 ```
 
-### 方式 3：Hermes skillpack 安装（如可用）
+### 方式 4：Hermes skillpack 安装（如发布到 gbrain registry）
 
 ```bash
 gbrain skillpack install guanyuan-majia
@@ -323,6 +353,7 @@ guanyuan-majia/
 
 完整变更历史见 [SKILL.md 末尾的版本记录](./SKILL.md#-版本记录)。
 
+- **V1.4.0** (2026-05-09) — 📦 npm package 化。发布 [`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi) 到 npm registry，新增 `bin/install.js` 内置 CLI（`install` / `list` / `uninstall` 三命令），自动检测 Claude Code / OpenClaw / Codex / Hermes 4 个 agent 工具并安装，永不覆盖用户的 `config.json`。一行安装：`npx @supermajia/guanyuan-bi install`。
 - **V1.3.1** (2026-05-09) — 外部代码审查修复（patch）：补上 SKILL.md 未闭合代码块、新增 B-7.0 删除前硬性安全闸（agent 必须用户逐项确认才能 DELETE）、scripts/guandata.py `--task` 加输入校验封堵路径穿越、frontmatter description 版本号对齐。
 - **V1.3** (2026-05-09) — 工具无关化。原生兼容 Claude Code / OpenClaw / Codex / Hermes (gbrain)。新增仓库根 `AGENTS.md`（Codex 项目指令 + Hermes resolver）+ `manifest.json`（工具无关元数据）；去掉所有 `~/.claude/skills/` 类硬编码路径；README 加 Compatibility 章节列出每工具安装命令。
 - **V1.2** (2026-05-09) — 吸收 OpenAI Codex 的 ExecPlan 规范，新增 B-17.11 用 ExecPlan 管理重写工程（SmartETL 改写专用骨架 + 四个活文档章节实战用法）+ B-12 工程化指针；`references/` 加 execplan-spec.md + agents-rule.md

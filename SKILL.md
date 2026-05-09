@@ -1,10 +1,10 @@
 ---
 name: guanyuan-majia
 description: 观远 BI（马甲专版 V1.3）— 数据查询/建卡/取数 + ETL 治理/写入/删除 + 自定义图表开发 全链路。Part A：用 guandata.py 做数据获取与分析（list-datasets / get-columns / search-values / create-and-get / create-card / get-card-data / delete-cards / create-page / release-page / list-pages）+ guancli 只读探索（ds/etl/page/card/metric/task/form/fetch）。Part B：用 guancli 做 ETL 治理与写入全链路（POST /api/directory ETL/DATA_SET 双树建目录、POST /api/etl/direct-save create+update 同接口、POST /api/etl/execute、GET /api/task 拿真实错误、DELETE /api/data-source 先于 DELETE /api/etl、批量扫描判断 ETL/字段去留、ODS/DIM/DWD/DWS/APP 五层分层、字段使用度双源审计、v2→v3 批量改造 SDK、CTO 张进的 SmartETL 全链路重写方法论：全链路追到原始源/旧资产只读/新链只允许 SQL 节点/双层结构+数值验收/副本页卡片级验收/差异追踪 5 步法/空快照处理标准/ExecPlan+modeling+evidence 交付物），10 类高频报错修复。Part C：自定义图表 HTML/CSS/JS 注入开发与排障（renderChart 4 参数 runtime 契约、payload_json 截断判断、固定卡片/overlay/z-index/stacking context、复制页 card id 重定位、懒加载 iframe、路由切换销毁注入物、live 浏览器验收、payload_json 拆列方案）。触发词：查数据、做图表、看报表、营业额、门店、会员、订单、分析、建卡、取数、删卡、ETL 治理、循环依赖、字段使用度、新建 ETL、修改 ETL、direct-save、ETL 报错、execute 失败、批量迁移 ETL、SmartETL 改写、全链路重写、副本页验收、差异追踪、空快照、自定义图表、HTML 注入、JS 注入、payload_json、overlay、固定卡片、z-index、看 BI HTTP API。
-version: "1.3.1"
+version: "1.4.0"
 ---
 
-# 观远 BI · 马甲专版（V1.3.1）
+# 观远 BI · 马甲专版（V1.4.0）
 
 ## 🧭 Part 选择
 
@@ -18,7 +18,7 @@ version: "1.3.1"
 | 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读章节末尾的"实战 ID 速查" |
 
 > **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）+ OpenAI Codex（V1.2 ExecPlan 规范）
-> **版本**：V1.3.1（2026-05-09，patch）· **作用域**：本地私有 BI 实例
+> **版本**：V1.4.0（2026-05-09）· **npm 包**：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi) · **作用域**：本地私有 BI 实例
 > **兼容工具**：Claude Code · OpenClaw · Codex · Hermes (gbrain) · 任何支持 `SKILL.md` frontmatter 的 agent。详见仓库根 [README · 兼容性](README.md#-兼容性--compatibility) 与 [AGENTS.md](AGENTS.md)。
 
 ---
@@ -2066,6 +2066,18 @@ new GDPlugin().init(renderChart);
 
 ## 📋 版本记录
 
+- **V1.4.0** (2026-05-09)：npm package 化 — 现在可以一行 `npx` 安装到任意 agent 工具。
+  - 📦 发布到 npm registry：[`@supermajia/guanyuan-bi`](https://www.npmjs.com/package/@supermajia/guanyuan-bi)
+  - 🚀 一行安装：`npx @supermajia/guanyuan-bi install` 自动检测当前机器上已装的 4 个 agent 工具并全部安装
+  - 🛠️ 内置 CLI（`guanyuan-bi` / `supermajia-guanyuan`）：
+    - `install [--tool claude-code|openclaw|codex|hermes|all] [--force] [--dry-run]`
+    - `list` 列出当前安装情况 + 每个工具的版本
+    - `uninstall --tool <name>`（自动备份用户已修改过的 `config.json` 到 `.backup`）
+  - 🛡️ 安全约束：
+    - **永远不覆盖已存在的 `config.json`**（保留真凭据，再装一次也不丢）
+    - 默认跳过已装目标，要 `--force` 才覆盖
+    - 排除 `.cache/` / `data/columns_cache/` / `.git/` 不进 npm tarball（`.npmignore` 三重保险 + `package.json files` 白名单 + dry-run 验证）
+  - 📁 新增文件：`package.json` / `bin/install.js`（10.9KB Node.js 安装器）/ `.npmignore`
 - **V1.3.1** (2026-05-09)：基于外部代码审查的修复版本（patch release，无新功能）。
   - 🐛 **P1 修复**：SKILL.md L185 附近 ` ```bash ` 代码块未闭合 ——补上关闭 fence，确保后续 Markdown 结构不错位。
   - 🛡️ **P2 安全**：新增 **B-7.0 删除前的硬性安全闸** —— Agent 在执行任何 `DELETE /api/data-source/` 或 `DELETE /api/etl/` 前必须满足四条硬约束（用户逐项明确确认 / 下游引用已切流 / 新链路对账通过 / 批量分批确认）。Agent 默认行为是产出待删清单供用户审阅，永远不主动删除。B-13 红线同步加一条最显眼的"未经用户逐项明确确认，绝不执行任何 DELETE 操作"。

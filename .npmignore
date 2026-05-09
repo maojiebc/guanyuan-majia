@@ -1,0 +1,42 @@
+# Don't ship git internals or local dev artifacts.
+# Note: package.json `files` already whitelists what to publish, so this is
+# defense in depth — if someone forgets a `files` entry, .npmignore still
+# blocks credentials and runtime caches from leaking.
+
+# Credentials — NEVER ship
+config.json
+.config.local.json
+
+# Runtime caches
+.cache/
+data/columns_cache/
+data/
+
+# Git / OS
+.git/
+.gitignore
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# This pkg's own dev test outputs
+test-install-output/

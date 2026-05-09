@@ -1,0 +1,55 @@
+{
+  "name": "@supermajia/guanyuan-bi",
+  "version": "1.4.0",
+  "description": "Tool-agnostic Agent Skill for Guandata BI (观远 BI). Data analysis + ETL governance/write + custom chart development. Compatible with Claude Code, OpenClaw, Codex, Hermes (gbrain).",
+  "keywords": [
+    "claude-code",
+    "claude-skill",
+    "agent-skill",
+    "openclaw",
+    "openai-codex",
+    "hermes",
+    "gbrain",
+    "guandata",
+    "guandata-bi",
+    "business-intelligence",
+    "etl",
+    "smartetl",
+    "data-analysis",
+    "custom-chart",
+    "execplan"
+  ],
+  "homepage": "https://github.com/maojiebc/guanyuan-majia",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maojiebc/guanyuan-majia.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maojiebc/guanyuan-majia/issues"
+  },
+  "license": "MIT",
+  "author": "maojiebc",
+  "bin": {
+    "guanyuan-bi": "./bin/install.js",
+    "supermajia-guanyuan": "./bin/install.js"
+  },
+  "files": [
+    "SKILL.md",
+    "AGENTS.md",
+    "manifest.json",
+    "README.md",
+    "README.en.md",
+    "ATTRIBUTIONS.md",
+    "LICENSE",
+    "config.example.json",
+    "bin/",
+    "scripts/",
+    "references/"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
