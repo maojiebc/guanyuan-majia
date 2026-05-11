@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project follows [Semantic Versioning](https://semver.org/) — see SKILL.md for
 the project's specific patch / minor / major rules.
 
+## [1.7.3] — 2026-05-11
+
+### Added
+- **Author/contact block appended to `SKILL.md` end** — ClawHub renders
+  `SKILL.md` (not `README.md`) on the skill listing page; without this
+  the 6-row channel table that v1.7.2 added to `README.md` wasn't
+  visible to ClawHub visitors. Block sits after all agent instructions
+  so it doesn't pollute the active context during invocation.
+
+Follows `majia-ota-skill` v0.6.1 two-placements rule.
+
 ## [1.7.2] — 2026-05-11
 
 ### Changed

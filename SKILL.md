@@ -3,7 +3,7 @@ name: guanyuan-majia
 description: 观远 BI（Guandata）全链路操作 — 数据查询/建卡/取数（Part A）、ETL 治理/写入/删除（Part B，含 SmartETL 全链路重写 + 字段使用度审计 + ExecPlan 工程化）、自定义图表 HTML/CSS/JS 注入与排障（Part C）。当用户提到 营业额/门店/会员/订单/建卡/取数/报表/ETL/direct-save/payload_json/自定义图表/观远/Guandata/BI 时使用。马甲业务实战版，60+ ETL 战例、10 类报错手册、Claude Code/OpenClaw/Codex/Hermes 通用。
 license: MIT
 metadata:
-  version: "1.7.2"
+  version: "1.7.3"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/guanyuan-majia
   openclaw:
@@ -984,3 +984,20 @@ new GDPlugin().init(renderChart);
   - 新增 **B-17 全链路重写方法论**（10 节）：4 件交付 + 8 条硬规则 + 5 步标准工作流 + 三层验收（数据集/副本页/卡片级）+ 差异追踪 5 步法 + 空快照处理标准 + ExecPlan/modeling/evidence/sql/raw 标准交付物 + 6 类专属常见坑 + 完成标准。
   - 新增 **Part C 自定义图表开发与排障**（10 节）：renderChart 4 参数 runtime 契约 + data 5 种形态识别 + payload_json 截断判断 3 步 + 拆列推荐方案 + overlay/mask 挂页面根节点 + z-index 基线（8/1/20）+ 懒加载 iframe 处理 + 路由切换销毁规则 + MutationObserver 死循环陷阱 + 复制页 card id 重定位 + 浏览器层级排障清单 + 最终真实浏览器验收 8 项。
 - **V1.0** (2026-05-09)：合并 guandata70 数据分析侧 + ETL 治理与写入侧。Part B 整合 60+ 张 ETL 创建/重构/修复实战经验，包括 11 个已实测 endpoint、8 维 ETL 去留判断、4 维字段去留判断、ODS/DIM/DWD/DWS/APP 五层分层、双源字段使用度审计、v2→v3 批量改造 SDK、10 类高频报错修复手册。
+
+## 👤 作者 / 联系
+
+**马甲（@maojiebc）** · 超级马甲
+
+如果这份 skill 帮到你，欢迎在以下任意渠道找我交流踩坑实录、提需求、报 bug，也欢迎勾兑用户运营 / 数据中台 / BI 工程的实战经验：
+
+| 渠道 | 链接 |
+|---|---|
+| 📧 Email | [m9224@163.com](mailto:m9224@163.com) |
+| 🐙 GitHub | [github.com/maojiebc](https://github.com/maojiebc) |
+| 🪝 ClawHub | [clawhub.ai/p/maojiebc](https://clawhub.ai/p/maojiebc) |
+| 🐦 X | [@maojiebc](https://x.com/maojiebc) |
+| 📕 小红书 | [超级马甲](https://xhslink.com/m/4fQMJeHHWKC) |
+| 📰 微信公众号 | **超级马甲** |
+
+> 这份 skill 是 14 年用户运营 + 观远 BI 实战 + 60+ 张 ETL 写入实证沉淀出来的，问题/合作随时聊。
