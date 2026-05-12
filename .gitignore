@@ -2,6 +2,10 @@
 config.json
 .config.local.json
 
+# Deny-list 本身含禁词，禁止 commit 到 public repo
+# Maintained locally; consumed by majia-ota-skill audit_skill_release.py --pii-scan
+.ota-deny-list.txt
+
 # 缓存数据 / Cache data
 .cache/
 data/columns_cache/
