@@ -4,7 +4,7 @@
 > Compatible with **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** and any agent that recognizes `SKILL.md` frontmatter.
 > Battle-tested with 60+ ETL create/refactor/repair operations + governance scans + custom chart injection debugging.
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.0.0-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v2.0.1-blue)](./SKILL.md)
 [![GitHub Release](https://img.shields.io/github/v/release/maojiebc/majia-guanyuan?label=release&color=success)](https://github.com/maojiebc/majia-guanyuan/releases)
 [![skills.sh](https://skills.sh/b/maojiebc/majia-guanyuan)](https://skills.sh/maojiebc/majia-guanyuan)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -406,7 +406,7 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 
 ## 📋 Version History
 
-**Latest: V2.0.0** (2026-05-12) — Renamed to `majia-guanyuan` + aligned with `@guandata/guancli@1.0.19` (ChatBI theme query / SuperApp / multi-env auth / connectivity probe) + Node ≥20.
+**Latest: V2.0.1** (2026-05-12) — Unified displayName to Chinese marketing name.
 
 Full changelog: [CHANGELOG.md](CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-guanyuan/releases).
 

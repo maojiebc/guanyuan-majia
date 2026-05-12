@@ -4,7 +4,7 @@
 > 兼容 **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** 等所有支持 SKILL.md 的 agent 工具。
 > 60+ 张 ETL 创建/重构/修复 + 治理扫描 + 自定义图表注入排障的真实战场记录。
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.0.0-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v2.0.1-blue)](./SKILL.md)
 [![GitHub Release](https://img.shields.io/github/v/release/maojiebc/majia-guanyuan?label=release&color=success)](https://github.com/maojiebc/majia-guanyuan/releases)
 [![skills.sh](https://skills.sh/b/maojiebc/majia-guanyuan)](https://skills.sh/maojiebc/majia-guanyuan)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -404,7 +404,7 @@ majia-guanyuan/
 
 ## 📋 版本记录
 
-**最新：V2.0.0** (2026-05-12) — 重命名为 `majia-guanyuan` + 对齐 `@guandata/guancli@1.0.19` 命令面（ChatBI 主题问数 / SuperApp / 多环境 auth / 连接探测）+ Node ≥20。
+**最新：V2.0.1** (2026-05-12) — displayName 统一为中文营销名。
 
 完整变更历史见 [CHANGELOG.md](CHANGELOG.md) 或 [GitHub Releases](https://github.com/maojiebc/majia-guanyuan/releases)。
 

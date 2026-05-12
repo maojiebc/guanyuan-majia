@@ -27,7 +27,7 @@ metadata:
           - guancli
 ---
 
-# 观远 BI · 马甲专版（V2.0.0）
+# 观远 BI · 马甲专版（V2.0.1）
 
 > **结构说明（V1.5.0 引入 progressive disclosure）**：本文档是**路由层 + 关键规则**，详细操作手册下沉到 `references/`。每个 Part 的入口章节会指出"何时回到 references/ 查全表"。完整章节索引见末尾的 [📚 References 目录](#-references-目录)。
 
@@ -43,7 +43,7 @@ metadata:
 | 不知道用哪个 | 看 Part B "推荐工作流" 章节，或直接读各 Part 章节末尾的"实战 ID 速查" |
 
 > **作者**：马甲（Part A/B 实证）+ 观远 CTO 张进（Part B-17 SmartETL 改写方法论 + Part C 自定义图表经验）+ OpenAI Codex（V1.2 ExecPlan 规范）
-> **版本**：V2.0.0（2026-05-12）· **环境**：Node ≥20 · **依赖**：`@guandata/guancli@^1.0.19` · **作用域**：本地私有 BI 实例
+> **版本**：V2.0.1（2026-05-12）· **环境**：Node ≥20 · **依赖**：`@guandata/guancli@^1.0.19` · **作用域**：本地私有 BI 实例
 > **安装**：`git clone https://github.com/maojiebc/majia-guanyuan.git` + `node bin/install.js install`，或 `npx github:maojiebc/majia-guanyuan install`
 > **兼容工具**：Claude Code · OpenClaw · Codex · Hermes (gbrain) · 任何支持 `SKILL.md` frontmatter 的 agent。详见 [README · 兼容性](README.md#-兼容性--compatibility) 与 [AGENTS.md](AGENTS.md)。
 >
@@ -946,7 +946,7 @@ new GDPlugin().init(renderChart);
 
 ## 📋 版本记录
 
-**最新：V2.0.0** (2026-05-12) — 重命名为 `majia-guanyuan` + 对齐 `@guandata/guancli@1.0.19` 命令面（ChatBI 主题问数 / SuperApp / 多环境 auth / 连接探测）+ Node ≥20。
+**最新：V2.0.1** (2026-05-12) — displayName 统一为中文营销名。
 
 完整变更历史见 [CHANGELOG.md](CHANGELOG.md) 或 [GitHub Releases](https://github.com/maojiebc/majia-guanyuan/releases)。
 
