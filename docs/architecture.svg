@@ -1,28 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760" font-family="-apple-system, 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 920" font-family="-apple-system, 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif">
   <defs>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="3" stdDeviation="8" flood-opacity="0.06"/>
+    </filter>
+    <filter id="newGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-opacity="0.18" flood-color="#ec4899"/>
     </filter>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#f8fafc"/>
       <stop offset="100%" stop-color="#eef2f7"/>
     </linearGradient>
+    <linearGradient id="newBadge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
   </defs>
 
-  <rect width="1280" height="760" fill="url(#bg)"/>
+  <rect width="1440" height="920" fill="url(#bg)"/>
 
   <!-- Header -->
-  <text x="640" y="46" text-anchor="middle" font-size="28" font-weight="700" fill="#0f172a">guanyuan-majia · 观远 BI 全链路 Agent Skill</text>
-  <text x="640" y="74" text-anchor="middle" font-size="13" fill="#64748b">三块拼图，覆盖一份 BI 工作的"读数 / 治理 / 自定义"全部场景  ·  工具无关 (Claude Code · OpenClaw · Codex · Hermes)</text>
+  <text x="720" y="52" text-anchor="middle" font-size="30" font-weight="700" fill="#0f172a">majia-guanyuan · 观远 BI 全链路 Agent Skill</text>
+  <g transform="translate(720, 68)">
+    <rect x="-70" y="0" width="140" height="24" rx="12" fill="#0f172a"/>
+    <text x="0" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#fef3c7">v2.1.2  ·  2026-05-14</text>
+  </g>
+  <text x="720" y="116" text-anchor="middle" font-size="13" fill="#64748b">三块拼图 + 三件套生态：覆盖一份 BI 工作的"读数 / 治理 / 自定义"全部场景  ·  工具无关 (Claude Code · OpenClaw · Codex · Hermes/gbrain)</text>
+
+  <!-- Ecosystem strip: 三件套分工 -->
+  <g transform="translate(55, 140)">
+    <text x="0" y="0" font-size="11" fill="#94a3b8" font-weight="700" letter-spacing="1.5">三件套共存 · 按角色分工</text>
+
+    <!-- guancli -->
+    <g transform="translate(0, 14)">
+      <rect width="430" height="74" rx="10" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <rect width="6" height="74" rx="3" fill="#3b82f6"/>
+      <text x="20" y="24" font-size="13" font-weight="700" fill="#0f172a">@guandata/guancli</text>
+      <text x="135" y="24" font-size="11" fill="#3b82f6" font-weight="600">1.0.19 · 公网 npm · 必装基底</text>
+      <text x="20" y="44" font-size="11" fill="#475569">官方 CLI · 取数 / 资源树 / Form 数据</text>
+      <text x="20" y="60" font-size="11" fill="#64748b">本 skill 所有 Part 共用的命令底盘</text>
+    </g>
+
+    <!-- guanvis-skill -->
+    <g transform="translate(450, 14)">
+      <rect width="430" height="74" rx="10" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <rect width="6" height="74" rx="3" fill="#8b5cf6"/>
+      <text x="20" y="24" font-size="13" font-weight="700" fill="#0f172a">@guandata/guanvis-skill</text>
+      <text x="180" y="24" font-size="11" fill="#8b5cf6" font-weight="600">0.1.13 · 内网 Nexus · 可选增强</text>
+      <text x="20" y="44" font-size="11" fill="#475569">标准 30+ 图表 / Page 装配 (JS DSL)</text>
+      <text x="20" y="60" font-size="11" fill="#64748b">V2.1.0 起 Part A 标准卡片优先路由到它</text>
+    </g>
+
+    <!-- majia-guanyuan -->
+    <g transform="translate(900, 14)">
+      <rect width="430" height="74" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" filter="url(#shadow)"/>
+      <rect width="6" height="74" rx="3" fill="#10b981"/>
+      <text x="20" y="24" font-size="13" font-weight="700" fill="#0f172a">majia-guanyuan</text>
+      <g transform="translate(140, 11)">
+        <rect width="44" height="16" rx="8" fill="#0f172a"/>
+        <text x="22" y="11" text-anchor="middle" font-size="10" font-weight="700" fill="#fef3c7">当前</text>
+      </g>
+      <text x="195" y="24" font-size="11" fill="#10b981" font-weight="600">2.1.2 · 实战沉淀 + 三块拼图</text>
+      <text x="20" y="44" font-size="11" fill="#475569">60+ ETL 战例 / 10 类报错 / 30 条法则</text>
+      <text x="20" y="60" font-size="11" fill="#64748b">Part B 严肃改造 · Part C 注入 · C-12 HTML 应用看板</text>
+    </g>
+  </g>
 
   <!-- A: Data Query -->
-  <g transform="translate(55, 110)">
-    <rect width="380" height="430" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-    <rect width="380" height="8" rx="3" fill="#3b82f6"/>
+  <g transform="translate(55, 264)">
+    <rect width="430" height="448" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+    <rect width="430" height="8" rx="3" fill="#3b82f6"/>
     <text x="24" y="46" font-size="11" fill="#3b82f6" font-weight="700" letter-spacing="1.5">PART A · 数据查询 / 出报表</text>
     <text x="24" y="80" font-size="22" font-weight="700" fill="#0f172a">🅰️ 取数 + 建卡</text>
     <text x="24" y="104" font-size="12" fill="#64748b">日常分析侧 — 一句话出图</text>
-    <line x1="24" y1="124" x2="356" y2="124" stroke="#f1f5f9"/>
+    <line x1="24" y1="124" x2="406" y2="124" stroke="#f1f5f9"/>
 
     <text x="24" y="152" font-size="13" font-weight="600" fill="#334155">触发场景</text>
     <text x="24" y="174" font-size="12" fill="#475569">"查 2 月各城市营业额"</text>
@@ -37,17 +87,25 @@
     <text x="24" y="350" font-size="12" fill="#475569">• 多表 / 多页面 / 多字段缓存（按 --task 隔离）</text>
     <text x="24" y="370" font-size="12" fill="#475569">• 自动处理观远 7.0+ draft-release 机制</text>
 
-    <text x="24" y="408" font-size="11" font-style="italic" fill="#94a3b8">入口指针：SKILL.md → Part A 区块</text>
+    <!-- V2.1 routing tip -->
+    <g transform="translate(24, 392)">
+      <rect width="382" height="36" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#8b5cf6" letter-spacing="0.5">V2.1 路由</text>
+      <text x="76" y="16" font-size="11" fill="#475569">标准卡片 → guanvis-skill (DSL)</text>
+      <text x="12" y="30" font-size="10.5" fill="#94a3b8">create-and-get / create-card 作为 fallback + payload 底层参考</text>
+    </g>
+
+    <text x="24" y="438" font-size="11" font-style="italic" fill="#94a3b8">入口指针：SKILL.md → Part A 区块</text>
   </g>
 
   <!-- B: ETL Governance -->
-  <g transform="translate(450, 110)">
-    <rect width="380" height="430" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-    <rect width="380" height="8" rx="3" fill="#f59e0b"/>
+  <g transform="translate(505, 264)">
+    <rect width="430" height="448" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+    <rect width="430" height="8" rx="3" fill="#f59e0b"/>
     <text x="24" y="46" font-size="11" fill="#f59e0b" font-weight="700" letter-spacing="1.5">PART B · ETL 治理 / 写入 / 重写</text>
     <text x="24" y="80" font-size="22" font-weight="700" fill="#0f172a">🅱️ ETL 全栈</text>
     <text x="24" y="104" font-size="12" fill="#64748b">数据中台 / 工程侧 — 严肃改造</text>
-    <line x1="24" y1="124" x2="356" y2="124" stroke="#f1f5f9"/>
+    <line x1="24" y1="124" x2="406" y2="124" stroke="#f1f5f9"/>
 
     <text x="24" y="152" font-size="13" font-weight="600" fill="#334155">触发场景</text>
     <text x="24" y="174" font-size="12" fill="#475569">"扫一遍 ETL 看哪些可以删"</text>
@@ -62,64 +120,83 @@
     <text x="24" y="350" font-size="12" fill="#475569">• v2 → v3 批量改造 SDK（7 步重写）</text>
     <text x="24" y="370" font-size="12" fill="#475569">• CTO 全链路重写法：4 件交付 + 8 条硬规则</text>
 
-    <text x="24" y="408" font-size="11" font-style="italic" fill="#94a3b8">入口指针：SKILL.md → Part B / Part B-17 区块</text>
+    <!-- Part B-17 highlight -->
+    <g transform="translate(24, 392)">
+      <rect width="382" height="36" rx="6" fill="#fef3c7"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#b45309" letter-spacing="0.5">B-17 ExecPlan</text>
+      <text x="100" y="16" font-size="11" fill="#78350f">SmartETL 全链路重写工程化</text>
+      <text x="12" y="30" font-size="10.5" fill="#a16207">先验数据 → ExecPlan → 重写 → 双跑对比 → 切流</text>
+    </g>
+
+    <text x="24" y="438" font-size="11" font-style="italic" fill="#94a3b8">入口指针：SKILL.md → Part B / Part B-17 区块</text>
   </g>
 
-  <!-- C: Custom Charts -->
-  <g transform="translate(845, 110)">
-    <rect width="380" height="430" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-    <rect width="380" height="8" rx="3" fill="#10b981"/>
-    <text x="24" y="46" font-size="11" fill="#10b981" font-weight="700" letter-spacing="1.5">PART C · 自定义图表注入 / 排障</text>
+  <!-- C: Custom Charts + C-12 HTML Dashboard -->
+  <g transform="translate(955, 264)">
+    <rect width="430" height="448" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+    <rect width="430" height="8" rx="3" fill="#10b981"/>
+    <text x="24" y="46" font-size="11" fill="#10b981" font-weight="700" letter-spacing="1.5">PART C · 自定义图表 / HTML 应用看板</text>
     <text x="24" y="80" font-size="22" font-weight="700" fill="#0f172a">🆎 前端注入</text>
     <text x="24" y="104" font-size="12" fill="#64748b">前端开发侧 — HTML/CSS/JS 进观远</text>
-    <line x1="24" y1="124" x2="356" y2="124" stroke="#f1f5f9"/>
+    <line x1="24" y1="124" x2="406" y2="124" stroke="#f1f5f9"/>
 
-    <text x="24" y="152" font-size="13" font-weight="600" fill="#334155">触发场景</text>
-    <text x="24" y="174" font-size="12" fill="#475569">"payload_json 解析失败"</text>
-    <text x="24" y="192" font-size="12" fill="#475569">"固定卡片错位 / overlay 切页残留"</text>
-    <text x="24" y="210" font-size="12" fill="#475569">"复制页之后图表悄悄失效"</text>
+    <text x="24" y="152" font-size="13" font-weight="600" fill="#334155">C-1 ~ C-11 · 既有页面注入 (传统路线)</text>
+    <text x="24" y="174" font-size="12" fill="#475569">• renderChart 4 参数 runtime 契约</text>
+    <text x="24" y="192" font-size="12" fill="#475569">• 5 种 data 形态识别 + payload_json 截断 3 步判断</text>
+    <text x="24" y="210" font-size="12" fill="#475569">• z-index 基线 (容器 8 / mask 1 / 固定卡 20)</text>
+    <text x="24" y="228" font-size="12" fill="#475569">• 生命周期销毁 + MutationObserver 死循环避坑</text>
 
-    <text x="24" y="248" font-size="13" font-weight="600" fill="#334155">关键能力</text>
-    <text x="24" y="270" font-size="12" fill="#475569">• renderChart 4 参数 runtime 契约</text>
-    <text x="24" y="290" font-size="12" fill="#475569">• 5 种 data 形态识别</text>
-    <text x="24" y="310" font-size="12" fill="#475569">• payload_json 截断 3 步判断（改数据 ≫ 堆兼容）</text>
-    <text x="24" y="330" font-size="12" fill="#475569">• z-index 基线（容器 8 / mask 1 / 固定卡 20）</text>
-    <text x="24" y="350" font-size="12" fill="#475569">• 生命周期：URL / 编辑态 / 路由离开 → 销毁</text>
-    <text x="24" y="370" font-size="12" fill="#475569">• MutationObserver 死循环避坑（用低频轮询）</text>
+    <!-- C-12 NEW block -->
+    <g transform="translate(24, 252)" filter="url(#newGlow)">
+      <rect width="382" height="158" rx="10" fill="#ffffff" stroke="url(#newBadge)" stroke-width="2"/>
+      <g transform="translate(12, 14)">
+        <rect width="44" height="18" rx="9" fill="url(#newBadge)"/>
+        <text x="22" y="13" text-anchor="middle" font-size="10" font-weight="800" fill="#ffffff" letter-spacing="0.5">NEW</text>
+      </g>
+      <text x="64" y="27" font-size="13" font-weight="700" fill="#0f172a">C-12 · HTML 应用化看板生成</text>
+      <text x="246" y="27" font-size="10" fill="#8b5cf6" font-weight="600">v2.1.1 引入</text>
 
-    <text x="24" y="408" font-size="11" font-style="italic" fill="#94a3b8">入口指针：SKILL.md → Part C 区块</text>
+      <text x="12" y="54" font-size="11.5" fill="#475569">触发词："更高级 / 应用化 / 不限标准看板"</text>
+      <text x="12" y="74" font-size="11.5" fill="#475569">• 6 模块默认故事线（总览→趋势→结构→四象限→行动）</text>
+      <text x="12" y="92" font-size="11.5" fill="#475569">• GDHTML 共享 runtime（12 个 API）+ SDK 决策</text>
+      <text x="12" y="110" font-size="11.5" fill="#475569">• selector → dataView 联动 descriptor patch (.bak 自动备份)</text>
+      <text x="12" y="128" font-size="11.5" fill="#475569">• 12 步 pack→patch→upload→verify + API 四层验收</text>
+      <text x="12" y="146" font-size="10.5" fill="#94a3b8" font-style="italic">templates/html-dashboard/ 起手包 (V2.1.2 npm files 修正)</text>
+    </g>
+
+    <text x="24" y="438" font-size="11" font-style="italic" fill="#94a3b8">入口指针：SKILL.md → Part C / C-12 + references/part-c-html-dashboard.md</text>
   </g>
 
   <!-- Bottom strip: shared facilities -->
-  <g transform="translate(55, 570)">
-    <rect width="1170" height="140" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-    <text x="22" y="34" font-size="15" font-weight="700" fill="#0f172a">📚 共用基础设施 · 三个 Part 都依赖</text>
+  <g transform="translate(55, 740)">
+    <rect width="1330" height="130" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+    <text x="22" y="32" font-size="15" font-weight="700" fill="#0f172a">📚 共用基础设施 · 三个 Part 都依赖</text>
 
-    <g transform="translate(22, 56)">
+    <g transform="translate(22, 54)">
       <text x="0" y="14" font-size="13" font-weight="600" fill="#334155">10 类报错手册</text>
       <text x="0" y="34" font-size="11" fill="#64748b">ETL 名 / 路径 / 权限 / NULL / 别名 /</text>
       <text x="0" y="50" font-size="11" fill="#64748b">UNION 列差 / 字符串 ↔ DATE 比较 …</text>
     </g>
 
-    <g transform="translate(310, 56)">
+    <g transform="translate(350, 54)">
       <text x="0" y="14" font-size="13" font-weight="600" fill="#334155">30 条法则白皮书</text>
       <text x="0" y="34" font-size="11" fill="#64748b">"先验数据再写代码"、"避免双源覆盖"、</text>
       <text x="0" y="50" font-size="11" fill="#64748b">"删除拓扑：先 data-source 后 etl"…</text>
     </g>
 
-    <g transform="translate(600, 56)">
+    <g transform="translate(680, 54)">
       <text x="0" y="14" font-size="13" font-weight="600" fill="#334155">60+ 真实战例</text>
-      <text x="0" y="34" font-size="11" fill="#64748b">实战 BI 数据中台：80+ ETL / 250+ 数据集 /</text>
+      <text x="0" y="34" font-size="11" fill="#64748b">实战 BI 数据中台：77 ETL / 251 数据集 /</text>
       <text x="0" y="50" font-size="11" fill="#64748b">86 看板，覆盖 v3 重构 + 7 大签名动作</text>
     </g>
 
-    <g transform="translate(890, 56)">
-      <text x="0" y="14" font-size="13" font-weight="600" fill="#334155">渐进式披露</text>
-      <text x="0" y="34" font-size="11" fill="#64748b">SKILL.md 913 行 + references/ 按需加载</text>
-      <text x="0" y="50" font-size="11" fill="#64748b">v1.5.0 重构后 -56% token 占用</text>
+    <g transform="translate(1010, 54)">
+      <text x="0" y="14" font-size="13" font-weight="600" fill="#334155">渐进式披露 (v1.5 引入)</text>
+      <text x="0" y="34" font-size="11" fill="#64748b">SKILL.md 路由 + references/ 按需加载</text>
+      <text x="0" y="50" font-size="11" fill="#64748b">-1.2 万 token / 次调用</text>
     </g>
   </g>
 
-  <!-- Footer -->
-  <text x="640" y="740" text-anchor="middle" font-size="11" fill="#94a3b8">install: gh skill install maojiebc/guanyuan-majia · npx skills add maojiebc/guanyuan-majia · /plugin marketplace add maojiebc/guanyuan-majia</text>
+  <!-- Footer install commands -->
+  <text x="720" y="900" text-anchor="middle" font-size="11" fill="#94a3b8">install: gh skill install maojiebc/majia-guanyuan · npx skills add maojiebc/majia-guanyuan · /plugin marketplace add maojiebc/majia-guanyuan · npm i @supermajia/majia-guanyuan</text>
 </svg>

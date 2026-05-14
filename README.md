@@ -25,7 +25,7 @@
 本 Skill 整合了观远 BI 的三大类操作能力到**一份 Claude Code Skill** 里，让 AI 既能日常查数据出报表，又能做严肃的 ETL 治理与写入，还能处理自定义图表的前端注入排障。
 
 <p align="center">
-  <img src="./docs/architecture.svg" alt="majia-guanyuan 三块拼图：Part A 数据查询 / Part B ETL 治理 / Part C 自定义图表" width="100%"/>
+  <img src="./docs/architecture.svg" alt="majia-guanyuan v2.1.2 功能图：三件套生态（guancli / guanvis-skill / majia-guanyuan）+ Part A 取数 + Part B ETL 全栈 + Part C 前端注入 / Part C-12 HTML 应用化看板（NEW）" width="100%"/>
 </p>
 
 | Part | 能力 | 触发场景 |

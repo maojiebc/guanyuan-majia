@@ -25,7 +25,7 @@
 This Skill consolidates three categories of Guandata BI operations into **a single Claude Code Skill**, so AI can handle daily reporting + serious ETL governance + frontend custom chart debugging — all in one place.
 
 <p align="center">
-  <img src="./docs/architecture.svg" alt="majia-guanyuan three-pillar map: Part A data query / Part B ETL governance / Part C custom charts" width="100%"/>
+  <img src="./docs/architecture.svg" alt="majia-guanyuan v2.1.2 capability map: three-skill ecosystem (guancli / guanvis-skill / majia-guanyuan) + Part A query + Part B ETL full-stack + Part C front-end injection / Part C-12 HTML application dashboard (NEW)" width="100%"/>
 </p>
 
 | Part | Capability | When to use |
