@@ -5,6 +5,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project follows [Semantic Versioning](https://semver.org/) — see SKILL.md for
 the project's specific patch / minor / major rules.
 
+## [2.1.5] — 2026-05-18
+
+### Added
+
+- **`references/restaurant-bi-formulas/`：餐饮连锁 BI 公式实战库** ——
+  全新一组 10 个 markdown 文件（**2881 行**），蒸馏自两段连续的餐饮 BI 分析师履职 + 39 个生产 ETL，**已完全脱敏**（品牌名 / 字段指纹 / 产品名 / POS 厂商名 / 路径全部抽象化）。Skill 触发关键词扩充：用户问"如何算复购率/客单价/同店增长"/"怎么判新老客"/"用餐时段怎么分桶"/"为什么会员数对不上"/**"我要写 DWD 宽表/评价 pipeline/财务对账"** 都会路由进来。
+  - **`README.md`** — 路由表 + 字段词典 + 5 条最易踩坑 TL;DR
+  - **`01-date-and-time.md`**（204 行）—— 实时日期范围、T-1 系列、近 N 天/月/周、用餐时段分桶、时间宏 `{{{...}}}` 三花括号规则、月份截取、日期距离、跨月对齐
+  - **`02-customer-and-membership.md`**（700 行）—— 顾客标识跨渠道统一化（4 级优先级回填）、新老客（日/周/月维度）、消费频次 3 口径辨析、人均消费、**RFM 8 类 × 参考营销策略对应表**、**R 阈值多档分级**（单档/三档/四档场景决策表）、跨天 vs 非跨天复购口径、90 天复购分桶、注册前后订单 4 层 CTE 嵌套窗口、累计会员/留存/流失
+  - **`03-revenue-kpi.md`**（237 行）—— AC、ADS、ADS_HD、ADT、AUD、Comp、TC_CRM%、NS_CRM%、营收/订单/渠道占比（含 `IF` 分母兜底）、客单分桶、累计消费窗口
+  - **`04-channel-and-store.md`**（414 行）—— 业务渠道（堂食/外卖）、订单子渠道大 case（2024 跨年映射）、时效类型、StoreDate 门店日键、成长类型（新店/Comp/次新/非Comp）、注册门店优先级回填、营业天数累计窗口、**多渠道评价 Pipeline 4 个 pattern**（跨年 APPEND / 美团 split vs 饿了么 from_json 图片字段差异 / 堂食打卡+订单双源 JOIN / 总聚合分类）
+  - **`05-coupon-and-discount.md`**（160 行）—— 核销率、折扣率聚合级 vs 单笔级、折扣分桶 7 档、券类型分流大 case、注册第一张券、30 日优惠订单比例
+  - **`06-sql-utils.md`**（349 行）—— 字符串拆解（LEFT/SUBSTR/INSTR/regexp_extract）、数组聚合（explode-split、collect_set-concat_ws）、开窗排名三件套对比、累计窗口、ClickHouse 多表 LEFT JOIN 模板、COALESCE/IFNULL 三态判断、评价归一化技巧
+  - **`07-data-quality-traps.md`**（245 行）—— NULL vs 0 vs 空字符串、三态判断（NULL / `''` / `'null'`）、字段口径歧义、TC 三口径、重复字段名教训、**通用字段词典**（餐饮连锁 A vs B vs 通用对照表）、`input1` 约定、日期边界 `>=` + `<` vs `BETWEEN`、CURDATE/current_date/now 区别
+  - **`08-etl-engineering-patterns.md`**（288 行）—— **6 大 ETL 工程范式**：① **10-CTE DWD 宽表底座**（1 个 SQL_SCRIPT 串联 6 张维表 + 8 个 CTE 衍生层）② **轻节点重 SQL vs 重节点轻 SQL 工程哲学**（39 ETL 复杂度分布 + 选择经验法则）③ **财务双源对账**（FULL OUTER JOIN + 浮点精度兜底模板）④ **POS 系统识别 + 渠道归一化**（"不可篡改特征 > 数字编码 > 业务语义 > 原值兜底" 优先级原则）⑤ **会员生命周期多输出**（27 节点 ETL，含归属门店优先级回填）⑥ **Cohort 日期×门店网格**（笛卡尔积 + LEFT JOIN 填零模板）
+  - **`09-etl-catalog.md`**（217 行）—— **39 个 V1 生产 ETL 索引清单**：按 11 业务域分类（基础维表层 / DWD 订单事实 / 会员档案 / 顾客行为分层 / 财务营收 / 营销目标 / 私域社群 / 活动券 / 评价管理 / 业务标签 / 数据质量），每个 ETL 给出节点数/输入/输出/SQL_SCRIPT 数/价值点；附复用决策表 + "体量 vs SQL_SCRIPT 占比" 统计分布 + V1 → V2 升级建议 + jq 引用方式
+
+- **`SKILL.md` Part 选择路由表新增条目**：
+  - 写餐饮业务公式 / 查字段口径 / 排数据质量坑 / ETL 工程范式 → 直接路由进 `references/restaurant-bi-formulas/README.md`
+  - 📚 References 目录新增独立分类 **"餐饮 BI 公式实战库（V2.1.5 新建）"**，列出 10 个 reference 文件
+  - 路径表 + 三件套版本对齐：本 skill 版本 `2.1.4` → `2.1.5`
+
+### Changed
+
+- `manifest.json` `version: "2.1.4"` → `"2.1.5"`；`description` 追加 V2.1.5 重大增量摘要
+- `package.json` 同上版本号同步 + description 重写突出新增的餐饮公式库与 ETL 范式
+- `SKILL.md` frontmatter `version: "2.1.4"` → `"2.1.5"`、主标题、版本头日期 `2026-05-15` → `2026-05-18`
+
+### Notes
+
+- **零 breaking change**：纯 docs 增量 + 索引扩充。老用户 `git pull` / `npm i @supermajia/majia-guanyuan@latest` / ClawHub / `gh skill` 一键升级，现有工作流不受影响。
+- **所有内容均已脱敏**：品牌名（A 咖啡/B 麻辣烫 → 餐饮连锁 A/B）、产品/品类指纹（藤椒/麻辣烫/姬松茸/冬阴 等 15 类口味 → 商品风味分类示例）、POS 厂商真实名（甩手/哗啦啦/轩亚云/亮店掌/冥晨 → POS_A~POS_E）、路径（iCloud 绝对路径 → 占位说明）、个人后缀（"—马甲"）全部清理。3 轮 grep 扫描通过零命中验证。
+
 ## [2.1.4] — 2026-05-15
 
 ### Added

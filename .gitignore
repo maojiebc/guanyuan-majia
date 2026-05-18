@@ -34,3 +34,6 @@ venv/
 .vscode/
 .idea/
 *.iml
+
+# Social drafts (per-version local content not for publication)
+.social-draft-*.md

@@ -4,7 +4,7 @@
 > 兼容 **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** 等所有支持 SKILL.md 的 agent 工具。
 > 60+ 张 ETL 创建/重构/修复 + 治理扫描 + 自定义图表注入排障的真实战场记录。
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.1.4-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v2.1.5-blue)](./SKILL.md)
 [![GitHub Release](https://img.shields.io/github/v/release/maojiebc/majia-guanyuan?label=release&color=success)](https://github.com/maojiebc/majia-guanyuan/releases)
 [![skills.sh](https://skills.sh/b/maojiebc/majia-guanyuan)](https://skills.sh/maojiebc/majia-guanyuan)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -404,7 +404,9 @@ majia-guanyuan/
 
 ## 📋 版本记录
 
-**最新：V2.1.4** (2026-05-15) — 命令面同步 `@guandata/guancli@1.0.21`：① **`metric query` 泛化查询**（1.0.20 新增）完整接入 —— `--compare yoy|mom|qoq|wow|dod`、`--xtd ytd|qtd|mtd|wtd|dtd`、`--recent 7d|4w|3m`（带 `--recent-base`）、`--percentage --percentage-dim`、`--rank-top N --rank-dim ... --rank-order`、`--last`、兜底 `--adv-calc-json`，业务侧"同比/累计/最近 N 天/各城市占比/Top 10"一行命令出数，不必去 BI 后台建派生指标实例；② **`card preview -f excel`**（1.0.20）—— Excel 2003 XML 直接重定向 `.xls`，同时 `--limit` 默认抬到 10000、`--sort-asc/desc` 取数下限 10000；③ **错误输出更干净**（1.0.21），`guancli ... 2>&1 | head -n 5` 不再被 `Usage:` / `Available Commands:` 长串覆盖，Part B 报错速查脚本更可靠。manifest 依赖约束 `^1.0.19 → ^1.0.21`；命令面与判断表写进 [references/guancli-commands.md](references/guancli-commands.md)。
+**最新：V2.1.5** (2026-05-18) — **新增 `references/restaurant-bi-formulas/`：餐饮连锁 BI 公式实战库**（10 个 markdown，2881 行，已完全脱敏）。蒸馏自两段连续的餐饮 BI 分析师履职 + 39 个生产 ETL，含：① **公式手册**（7 章 60+ SQL）—— 日期时间 / 顾客会员（RFM 8 类 × 营销策略 + R 阈值多档分级）/ 营收 KPI（AC/ADS/ADT/Comp/CRM%）/ 渠道门店（多渠道评价 pipeline）/ 券折扣 / SQL 工具箱 / 数据质量陷阱；② **6 大 ETL 工程范式**（08 章）—— 10-CTE DWD 宽表底座 / 轻节点重 SQL vs 重节点轻 SQL 工程哲学 / 财务双源对账 / POS 系统识别归一化 / 会员生命周期多输出 / Cohort 日期×门店网格；③ **39 个 V1 生产 ETL 索引清单**（09 章）—— 按 11 业务域分类 + 每 ETL 的节点/输入/输出/SQL 速查 + 复用决策表。SKILL.md 主路由表新增餐饮业务公式入口。零 breaking change，纯 docs 增量。详细变更见 [CHANGELOG.md](./CHANGELOG.md)。
+
+**V2.1.4** (2026-05-15) — 命令面同步 `@guandata/guancli@1.0.21`：① **`metric query` 泛化查询**（1.0.20 新增）—— `--compare yoy|mom|qoq|wow|dod`、`--xtd ytd|qtd|mtd|wtd|dtd`、`--recent 7d|4w|3m`、`--percentage`、`--rank-top N`、`--last`、兜底 `--adv-calc-json`；② **`card preview -f excel`**（1.0.20）—— Excel 2003 XML 直接重定向 `.xls`；③ **错误输出更干净**（1.0.21）。manifest 依赖约束 `^1.0.19 → ^1.0.21`。
 
 **V2.1.3** (2026-05-14) — 纯文档 patch：刷新 `docs/architecture.svg` 功能说明图，从 v1.5 "三块拼图"升级到 v2.1.x 现实——新增"三件套生态"条带（guancli 1.0.19 / guanvis-skill 0.1.13 / majia-guanyuan 2.1.3）+ Part C-12 HTML 应用化看板 NEW 高亮模块（粉紫渐变 + glow）+ 底部数字校准。同步生成 2880×1840 @2x DPI PNG 渲染产物（`docs/architecture.png`，供 npm/ClawHub 页面 fallback）。`package.json#files` 把 `docs/` 也补进 npm tarball。
 

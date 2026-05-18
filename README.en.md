@@ -4,7 +4,7 @@
 > Compatible with **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** and any agent that recognizes `SKILL.md` frontmatter.
 > Battle-tested with 60+ ETL create/refactor/repair operations + governance scans + custom chart injection debugging.
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.1.4-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v2.1.5-blue)](./SKILL.md)
 [![GitHub Release](https://img.shields.io/github/v/release/maojiebc/majia-guanyuan?label=release&color=success)](https://github.com/maojiebc/majia-guanyuan/releases)
 [![skills.sh](https://skills.sh/b/maojiebc/majia-guanyuan)](https://skills.sh/maojiebc/majia-guanyuan)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -406,7 +406,9 @@ This skill stands on the shoulders of multiple predecessors and experience contr
 
 ## 📋 Version History
 
-**Latest: V2.1.4** (2026-05-15) — Command surface synced with `@guandata/guancli@1.0.21`: ① **`metric query` generalized query** (1.0.20) — `--compare yoy|mom|qoq|wow|dod`, `--xtd ytd|qtd|mtd|wtd|dtd`, `--recent 7d|4w|3m` (with `--recent-base`), `--percentage --percentage-dim`, `--rank-top N --rank-dim --rank-order`, `--last`, fallback `--adv-calc-json`. Business questions like "yoy / mom / year-to-date / recent 7 days / share by city / top 10" now answered in one CLI call, no need to spin up a new derived metric in the BI backend. ② **`card preview -f excel`** (1.0.20) — Excel 2003 XML export, redirect `> out.xls`; `--limit` default raised to 10000; `--sort-asc/desc` lower bound 10000 rows. ③ **Cleaner error output** (1.0.21) — `guancli ... 2>&1 | head -n 5` no longer drowned in `Usage:` help, Part B's error-capture scripts are reliable again. Manifest dep bumped `^1.0.19 → ^1.0.21`. Full command surface in [references/guancli-commands.md](references/guancli-commands.md).
+**Latest: V2.1.5** (2026-05-18) — **NEW `references/restaurant-bi-formulas/`: restaurant-chain BI formula playbook** (10 markdown files, 2881 lines, fully anonymized). Distilled from two consecutive production analyst tenures + 39 production ETLs, covering: ① **Formula handbook** (7 chapters, 60+ SQL snippets) — date/time, customer/membership (RFM 8-class × marketing-action mapping + R-threshold tiers), revenue KPIs (AC/ADS/ADT/Comp/CRM%), channel/store (multi-channel review pipeline), coupon/discount, SQL utilities, data-quality traps. ② **6 ETL engineering patterns** (Ch 08) — 10-CTE DWD wide-table base / light-node-heavy-SQL vs heavy-node-light-SQL philosophy / financial dual-source reconciliation / POS system identification / member lifecycle multi-output / Cohort date×store grid. ③ **39 production ETL catalog index** (Ch 09) — categorized across 11 business domains + per-ETL node/IO/SQL quick reference + reuse decision matrix. SKILL.md routing table now includes restaurant BI formula entry. Zero breaking change, pure docs increment. Full details in [CHANGELOG.md](./CHANGELOG.md).
+
+**V2.1.4** (2026-05-15) — Command surface synced with `@guandata/guancli@1.0.21`: ① **`metric query` generalized query** (1.0.20) — `--compare`, `--xtd`, `--recent`, `--percentage`, `--rank-top`, `--last`, fallback `--adv-calc-json`; ② **`card preview -f excel`** (1.0.20) — Excel 2003 XML export; ③ **Cleaner error output** (1.0.21). Manifest dep bumped `^1.0.19 → ^1.0.21`.
 
 **V2.1.3** (2026-05-14) — Documentation-only patch: refreshed `docs/architecture.svg` capability map to reflect the v2.1.x reality — new "three-skill ecosystem" strip (guancli 1.0.19 / guanvis-skill 0.1.13 / majia-guanyuan 2.1.3) + Part C-12 HTML application dashboard NEW highlight block (pink-purple gradient + glow). Also adds a 2880×1840 @2x DPI rendered PNG (`docs/architecture.png`) for npm/ClawHub page fallback. `package.json#files` now ships `docs/` inside the npm tarball.
 
