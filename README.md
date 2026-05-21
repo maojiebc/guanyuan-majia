@@ -4,7 +4,7 @@
 > 兼容 **Claude Code** · **OpenClaw** · **Codex** · **Hermes (gbrain)** 等所有支持 SKILL.md 的 agent 工具。
 > 60+ 张 ETL 创建/重构/修复 + 治理扫描 + 自定义图表注入排障的真实战场记录。
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.1.5-blue)](./SKILL.md)
+[![Skill Version](https://img.shields.io/badge/skill-v2.1.7-blue)](./SKILL.md)
 [![GitHub Release](https://img.shields.io/github/v/release/maojiebc/majia-guanyuan?label=release&color=success)](https://github.com/maojiebc/majia-guanyuan/releases)
 [![skills.sh](https://skills.sh/b/maojiebc/majia-guanyuan)](https://skills.sh/maojiebc/majia-guanyuan)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -404,7 +404,11 @@ majia-guanyuan/
 
 ## 📋 版本记录
 
-**最新：V2.1.5** (2026-05-18) — **新增 `references/restaurant-bi-formulas/`：餐饮连锁 BI 公式实战库**（10 个 markdown，2881 行，已完全脱敏）。蒸馏自两段连续的餐饮 BI 分析师履职 + 39 个生产 ETL，含：① **公式手册**（7 章 60+ SQL）—— 日期时间 / 顾客会员（RFM 8 类 × 营销策略 + R 阈值多档分级）/ 营收 KPI（AC/ADS/ADT/Comp/CRM%）/ 渠道门店（多渠道评价 pipeline）/ 券折扣 / SQL 工具箱 / 数据质量陷阱；② **6 大 ETL 工程范式**（08 章）—— 10-CTE DWD 宽表底座 / 轻节点重 SQL vs 重节点轻 SQL 工程哲学 / 财务双源对账 / POS 系统识别归一化 / 会员生命周期多输出 / Cohort 日期×门店网格；③ **39 个 V1 生产 ETL 索引清单**（09 章）—— 按 11 业务域分类 + 每 ETL 的节点/输入/输出/SQL 速查 + 复用决策表。SKILL.md 主路由表新增餐饮业务公式入口。零 breaking change，纯 docs 增量。详细变更见 [CHANGELOG.md](./CHANGELOG.md)。
+**最新：V2.1.7** (2026-05-21) — **路由/触发层强化（docs-only）**。重写 `SKILL.md` frontmatter `description`，把 V2.1.6 Part D（v7 BI / `60004` 草稿 / guanvis-skill / CSV 三态 / Spark CTE 中文别名 / `1012` 同名文件）和 V2.1.5 餐饮 BI 公式库（复购率/客单价/RFM/DWD 宽表/财务对账/AC/ADS/Comp）的触发关键词全列了进来——原描述只覆盖 Part A/B/C，新场景的用户语料根本不路由进来。同时新增 `# 🆎 Part D` stub section（紧跟 Part C 后），结构上对齐 Part A/B/C/C-12 的可见度。修三处 V2.1.6 残留版本错位（主标题 V2.1.5→V2.1.7、openclaw npm 约束 `^1.0.21→^1.0.24`、三件套表 `majia-guanyuan` 行 2.1.5→2.1.7）。零 references / templates / 命令面改动。
+
+**V2.1.6** (2026-05-21) — **新增 `references/v7-page-card-publish-pipeline.md`：V7 Page/Card 发布流水线 + 三态硬规则**（~340 行）。沉淀自一次"连锁咖啡 BI 演示拍摄录制"全流程实战（90 天 / 1200 门店 / 80K 会员 / 20 张表 / 17 个 ETL / 6 个 HTML 应用化看板）的 12 大踩坑：① v7 BI 草稿/发布机制 `POST /api/page+/api/card` 全失败（`60004 此操作只能在草稿页面执行`），银弹是 `guancli ≥ 1.0.24` 自带 `guanvis-skill` 一键 `publish .`；② CSV 三态判断硬规则——`会员ID IS NOT NULL` 把散客算成会员使北极星指标 = 100% 假数据；③ STRING vs DATE 类型边界；④ CSV 布尔字段 `'TRUE'/'FALSE'`；⑤ Spark CTE 别名必须英文；⑥ Window 不能嵌套在 aggregate；⑦ ETL update 必须带 `OUTPUT_DATASET.dataSource.dsId`；⑧ 数据集上传无原生 API；⑨ pandas to_csv 比 to_excel 快 50×；⑩ JOIN 键全局命名；⑪ 奶白主题；⑫ HTML SDK 最小骨架。SKILL.md 主路由表新增 Part D 入口。`@guandata/guancli` 依赖升级 `^1.0.21 → ^1.0.24`（自带 guanvis-skill 公网分发）。
+
+**V2.1.5** (2026-05-18) — **新增 `references/restaurant-bi-formulas/`：餐饮连锁 BI 公式实战库**（10 个 markdown，2881 行，已完全脱敏）。蒸馏自两段连续的餐饮 BI 分析师履职 + 39 个生产 ETL，含：① **公式手册**（7 章 60+ SQL）—— 日期时间 / 顾客会员（RFM 8 类 × 营销策略 + R 阈值多档分级）/ 营收 KPI（AC/ADS/ADT/Comp/CRM%）/ 渠道门店（多渠道评价 pipeline）/ 券折扣 / SQL 工具箱 / 数据质量陷阱；② **6 大 ETL 工程范式**（08 章）—— 10-CTE DWD 宽表底座 / 轻节点重 SQL vs 重节点轻 SQL 工程哲学 / 财务双源对账 / POS 系统识别归一化 / 会员生命周期多输出 / Cohort 日期×门店网格；③ **39 个 V1 生产 ETL 索引清单**（09 章）—— 按 11 业务域分类 + 每 ETL 的节点/输入/输出/SQL 速查 + 复用决策表。SKILL.md 主路由表新增餐饮业务公式入口。零 breaking change，纯 docs 增量。详细变更见 [CHANGELOG.md](./CHANGELOG.md)。
 
 **V2.1.4** (2026-05-15) — 命令面同步 `@guandata/guancli@1.0.21`：① **`metric query` 泛化查询**（1.0.20 新增）—— `--compare yoy|mom|qoq|wow|dod`、`--xtd ytd|qtd|mtd|wtd|dtd`、`--recent 7d|4w|3m`、`--percentage`、`--rank-top N`、`--last`、兜底 `--adv-calc-json`；② **`card preview -f excel`**（1.0.20）—— Excel 2003 XML 直接重定向 `.xls`；③ **错误输出更干净**（1.0.21）。manifest 依赖约束 `^1.0.19 → ^1.0.21`。
 

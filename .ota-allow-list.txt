@@ -263,3 +263,13 @@ governance-report.md
 宏（
 # "宏（观远"（"时间宏（观远 BI 平台关键字）"）
 宏（观远
+
+# ---- V2.1.7 (2026-05-21) 新增：v2.1.6 已合入的 demo-IDs / 误报短语 ----
+# v7-page-card-publish-pipeline.md 里 guanvis-skill genid 生成的示例 ID
+# (非真实 BI 资源 ID，纯为说明 setId/setParentDir 的代码示例)
+u56dfa1e159b55357ac0d6bc
+a938ad9fc26458e4377e90ae
+l5b686c77ff07c1e21e49d0a
+wbcc12714d05249f4a615f8d
+# "有强抵触" 业务用户对深色主题反馈语，触发了 [汉字]+强 的人名 shape 误报
+有强抵触

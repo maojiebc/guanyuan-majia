@@ -5,6 +5,63 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project follows [Semantic Versioning](https://semver.org/) — see SKILL.md for
 the project's specific patch / minor / major rules.
 
+## [2.1.7] — 2026-05-21
+
+### Changed
+
+- **`SKILL.md` frontmatter `description` 大幅扩展** —— 加入 V2.1.6 的 Part D 触发关键词
+  和 V2.1.5 的餐饮 BI 公式库触发关键词，把"用户撞到这些场景才触发本 skill"的关键
+  字面 token 写进描述里。这是这版最重要的改动：trigger 用的是 frontmatter
+  description，原描述只列了 Part A/B/C，Part D（v7 BI / `60004` 草稿 / guanvis-skill /
+  CSV 三态 / Spark CTE 中文别名 / `1012` 同名文件）和餐饮库（复购率 / 客单价 / RFM /
+  DWD 宽表 / 财务双源对账 / AC / ADS / Comp）的所有用户语料**根本不会路由进来**。
+  这次的描述把 5 大能力按"业务标签 + 报错字面量 + 工具关键词"三类全列了进来。
+
+- **`SKILL.md` 新增 `# 🆎 Part D` stub section**（紧跟 Part C C-12 后、References 目录前）——
+  原先 Part D 只在主路由表第 44 行出现一个表格项，主文里没有自己的章节，跟
+  Part A/B/C 三大块在结构上不对称（即使 Part C-12 这种 reference-only 节也写了
+  ~15 行 stub）。这次按 Part C-12 同款模板补齐：触发场景 7 条枚举 / 架构与硬规则 /
+  两条"不能跳的硬约束" / 入口指向 `references/v7-page-card-publish-pipeline.md`。
+  Progressive disclosure 不变，主文增 ~28 行换 Part D 在 routing/分流上的正式
+  地位。
+
+- **三处 V2.1.6 残留版本号修正** ——
+  ① `SKILL.md` 主标题 `# 观远 BI · 马甲专版（V2.1.5）` → `（V2.1.7）`，发布
+  V2.1.6 时漏改；
+  ② `SKILL.md` frontmatter `metadata.openclaw.install` 的 npm 约束 `@guandata/guancli@^1.0.21`
+  → `^1.0.24`，对齐 `manifest.json` 和 V2.1.6 body 段 `版本：V2.1.6 ... 依赖：@guandata/guancli@^1.0.24`
+  的事实；
+  ③ `SKILL.md` "三件套角色互补"表 `majia-guanyuan` 行版本 `2.1.5` → `2.1.7`，
+  同时把"主要角色"列加上"V7 发布流水线"，"何时触发"列追加 V2.1.6 一行能力摘要。
+
+- **`SKILL.md` 版本头** `V2.1.6（2026-05-21）` → `V2.1.7（2026-05-21）`，"V2.1.6 新增"
+  字样保留为历史注解（"V2.1.6 起"）。
+
+### Updated
+
+- `manifest.json` `version: "2.1.6"` → `"2.1.7"`；`description` 开头把"V2.1.7 是 routing/triggering refresh"
+  写明，把这次的具体变更（描述扩展 / Part D stub / 三处版本字符串校对）列出来。
+- `package.json` `version: "2.1.6"` → `"2.1.7"`；`description` 重排为 "5 大能力 + V2.1.7 是 routing
+  refresh + V2.1.6/V2.1.5 历史摘要"，结构更清晰，npm 详情页可读。
+- `README.md` / `README.en.md` 顶部版本记录补 V2.1.7 entry。
+
+### Notes
+
+- **零 references / templates 新文件 / 零 SKILL.md 命令面改动** —— V2.1.7 是 docs-only
+  refresh，重点是让 Skill 在用户问"v7 BI 看板被 60004 卡住"、"散客订单算成 100%
+  会员订单"、"Spark `WITH 订单汇总 AS` 报错"、"复购率怎么算"、"AC 老店怎么定义"
+  这类问题时能正确触发——之前 description 没列这些关键词，trigger 命中率
+  低；这次补全后命中率应明显提升。
+- **零 breaking change** —— 所有命令面、Part A/B/C/D 主体内容、依赖约束 都保持
+  V2.1.6 状态。老用户 `git pull` / `npm i @supermajia/majia-guanyuan@latest` / ClawHub
+  一键升级即可。
+
+### Why this is its own version
+
+`@supermajia/majia-guanyuan@2.1.6` 已发布到 npm，registry 拒绝同版本号重发。
+本次是 trigger 路由层强化（description 扩描 + Part D stub），按 V2.1.x 既有节奏走
+PATCH bump 即可。和 V2.1.4 / V2.1.5 同款 docs-only 模式。
+
 ## [2.1.6] — 2026-05-21
 
 ### Added
