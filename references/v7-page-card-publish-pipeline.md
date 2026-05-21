@@ -426,3 +426,185 @@ demo-工程文件/
 - **本文件** 是"从零到 6 个看板上线"的端到端流程，重点在 v7 BI 实例 + guanvis-skill 一键发布
 
 两者互补：先看本文件知道"用 guanvis-skill"，遇到 selector 联动到 custom chart dataView 时再回 C-12 查 descriptor patch 章节。
+
+---
+
+## §14 SmartETL 节点化的两个新坑（2026-05-21 沉淀）
+
+> **来源**：把 6 个 ETL 从"全 SQL 三节点版"改成"花式 SmartETL 节点链"演示版的实战。把 SQL 三节点拆成 8-17 个节点（INPUT / FILTER_ROWS / CALCULATOR / GROUP_BY / JOIN_DATA / SQL_SCRIPT / OUTPUT）时，踩到两个**永远不会出错误日志**的静默坑。两个坑都"看起来正常但数据全错"，是 demo 演示时最致命的。
+>
+> **何时读这里**：用 `node_group_by()` / `node_join()` 构造 SmartETL 节点，发现输出字段是空值 / 行数爆炸到亿级 / 看板指标显示成 ID 字符串。
+
+### §14.1 **GROUP_BY 节点不支持 STRING 字段的 COUNT / COUNT_DISTINCT**
+
+**现象**：
+- 调用 `node_group_by(metric_fields=[("订单ID", "STRING", "COUNT_DISTINCT")])`
+- direct-save 返回 success，execute 也 FINISHED
+- 但下游 JOIN/CALC 用这个"订单数"字段时，预览数据看到的不是数字 5/8/16，而是 **`O2026022800000065`** 这种**订单 ID 字符串**
+
+**根因**：BI 把请求里的 `aggrType: "COUNT_DISTINCT"` **静默改成 `aggrType: "NUL"`**（用 `guancli fetch GET /api/etl/<dfId>` 反查 zoneData.metric 才能看到），等于没聚合，输出取了原字段第一个值。
+
+```bash
+# 验证手段
+guancli fetch GET "/api/etl/<dfId>" | jq '.response.actions[] | select(.type=="GROUP_BY") | .zoneData.metric'
+# 看 aggrType 是否被改成 "NUL"
+```
+
+**修复策略**（按业务语义二选一）：
+
+**A. 业务上唯一的字段** → 前置 CALC 派生 1 + GROUP_BY SUM
+
+```python
+# 例：dwd_订单 的 订单ID 业务唯一 → COUNT_DISTINCT(订单ID) == COUNT(*) == SUM(1)
+n_calc = node_calculator(idg, n_filter["id"], [
+    {"name": "订单计数", "type": "LONG", "expr": "1"},
+    # ... 其他派生字段
+])
+n_calc_keys = {f["name"]: a["key"] for f, a in zip([{"name":"订单计数"}], n_calc["formulas"])}
+
+n_group = node_group_by(idg, n_calc["id"], "dwd_订单",
+    row_fields=[("门店ID","STRING"), ("业务日期","DATE")],
+    metric_fields=[
+        ("订单计数", "LONG", "SUM"),  # = 订单数
+        # ...
+    ],
+    extra_row_keys=n_calc_keys,
+)
+```
+
+**B. 真去重需求**（同一 key 在源表多次出现）→ **两层 GROUP_BY 模拟去重**
+
+```python
+# 例：dwd_会员触达 中同会员可能多次出现 → 必须真去重 COUNT_DISTINCT(会员ID)
+# 第一层 GROUP_BY: 把粒度细化到去重字段, 自然去重
+n_g1 = node_group_by(idg, n_calc["id"], "dwd_会员触达",
+    row_fields=[("活动ID","STRING"), ("会员ID","STRING")],  # 加入会员ID 粒度
+    metric_fields=[("查看标志", "LONG", "SUM")],
+    extra_row_keys=n_calc_keys,
+    name="第一层(活动ID×会员ID)",
+)
+n_g1_keys = {z["name"]: z["key"] for z in n_g1["zoneData"]["row"] + n_g1["zoneData"]["metric"]}
+
+# CALC: 派生 1 用于第二层 SUM 计数
+n_c2 = node_calculator(idg, n_g1["id"], [
+    {"name": "会员计数", "type": "LONG", "expr": "1"},
+])
+n_c2_keys = dict(n_g1_keys); n_c2_keys["会员计数"] = n_c2["formulas"][0]["key"]
+
+# 第二层 GROUP_BY: 粒度滚回, SUM(会员计数) = 去重会员数
+n_g2 = node_group_by(idg, n_c2["id"], None,
+    row_fields=[("活动ID","STRING")],
+    metric_fields=[
+        ("会员计数", "LONG", "SUM"),  # = COUNT_DISTINCT(会员ID)
+        ("查看标志", "LONG", "SUM"),
+    ],
+    extra_row_keys=n_c2_keys,
+    name="第二层粒度滚回(模拟去重)",
+)
+```
+
+**C. 实在不想拆节点** → SQL_SCRIPT 旁路 + JOIN 合并主聚合
+
+```python
+n_sql_dedup = node_sql(idg, [n_filter["id"]], """
+SELECT `门店ID`, `业务日期`, COUNT(DISTINCT `会员ID`) AS `去重会员数`
+FROM input1
+WHERE `会员ID` IS NOT NULL AND `会员ID` <> ''
+GROUP BY `门店ID`, `业务日期`
+""".strip(), [("门店ID","STRING"),("业务日期","DATE"),("去重会员数","LONG")])
+# 然后 JOIN n_group + n_sql_dedup ⚠注意见 §14.2 多谓词坑
+```
+
+### §14.2 **JOIN_DATA 节点不支持多谓词**（只取 predicates[0]）
+
+**现象**：
+- 调用 `node_join(predicates=[{"left":"门店ID","right":"门店ID"}, {"left":"业务日期","right":"业务日期"}])`
+- 节点 payload 里 `dataFusion.columnFuses[0].predicates` 数组确实有 2 个元素
+- direct-save 成功，execute FINISHED
+- 但**行数从预期 10 万爆到 900 万**（笛卡尔积）
+
+**根因**：BI JOIN_DATA 节点执行时**只用 `predicates[0]`**（第一个谓词），第二个及之后的全部忽略。等于只 JOIN 了门店ID，每个门店的 N 个日期 × M 个日期 = 笛卡尔积爆炸。
+
+**已试过无效的修复**：
+- 加 `"operator": "EQ"` 字段——还是只取第一个
+- 拆成两个 `columnFuses`——会被 BI 拒收
+
+**唯一可行修复**：**用 SQL_SCRIPT 节点替代多键 JOIN**
+
+```python
+# 多键 JOIN 必须降级 SQL_SCRIPT
+n_join_sql = node_sql(idg, [n_group["id"], n_sql_dedup["id"]], """
+SELECT
+  a.*,
+  COALESCE(b.`去重会员数`, 0) AS `去重会员数`
+FROM input1 a
+LEFT JOIN input2 b ON a.`门店ID` = b.`门店ID` AND a.`业务日期` = b.`业务日期`
+""".strip(), [
+    ("门店ID","STRING"), ("业务日期","DATE"),
+    # ... 复制 a 表所有字段 schema
+    ("去重会员数","LONG"),
+], name="多键 JOIN 降级 SQL")
+```
+
+**JOIN_DATA 仍可用的场景**：单键 JOIN（如 `门店ID = 门店ID` 关联门店主档）依然走 `node_join()`，速度比 SQL 快。
+
+**FULL_OUTER 也踩**：BI JOIN_DATA 的 `joinType` 支持 `LEFT_OUTER / RIGHT_OUTER / INNER`，但 `FULL_OUTER` 节点会被 BI **静默吞掉**（direct-save 返回的 actions 数量比发出去的少 1），下游引用就 `key not found: OpId(...)`。FULL_OUTER 必须 SQL_SCRIPT。
+
+### §14.3 SmartETL builder 函数库参考实现
+
+`smart_etl_builder.py` 工厂函数封装了上述两坑的兼容处理：
+
+```python
+def node_group_by(..., metric_fields, ...):
+    """⚠ 已知坑: BI GROUP_BY 节点不支持 STRING 字段的 COUNT/COUNT_DISTINCT
+       (aggrType 被静默改为 NUL, 输出为空).
+       去重计数请用 SQL_SCRIPT 节点旁路或两层 GROUP_BY 模拟,
+       非去重计数请前置 CALCULATOR 派生 1 + GROUP_BY SUM.
+    """
+    for f in metric_fields:
+        fname, ftype, aggr = f[0], f[1], f[2]
+        # COUNT/COUNT_DISTINCT 输出必为 LONG (即使 BI 还会改成 NUL, 类型先对)
+        out_type = "LONG" if aggr in ("COUNT", "COUNT_DISTINCT") else ftype
+        if aggr == "AVG": out_type = "DOUBLE"
+
+def node_join(..., predicates, ...):
+    """⚠ 已知坑: BI JOIN_DATA 节点只取 predicates[0], 多谓词请用 SQL_SCRIPT 替代;
+                 FULL_OUTER joinType 会被静默吞掉, 也必须 SQL_SCRIPT."""
+    preds = [{"leftColumn": p["left"], "rightColumn": p["right"]} for p in predicates]
+```
+
+### §14.4 6 个 SmartETL 标杆实战节点链（demo 沉淀）
+
+| ETL 名 | 节点数 | 节点链 | 输出行数 | 关键技巧 |
+|---|---|---|---|---|
+| etl_dws_门店日报 | 10 | F+C+G+S×2+J+C | 105,524 | 多谓词 JOIN 降 SQL |
+| etl_dws_会员RFM分层 | 10 | F+C+G+S+J | 69,264 | 派生 1 + SUM 替代 COUNT_DISTINCT |
+| etl_dws_私域转化漏斗 | 10 | F+C+G+C+G+J+C | 27,048 | **两层 GROUP_BY 模拟去重** |
+| etl_dws_新店爬坡_Comp老店 | 8 | F+C+G+J+C | 105,524 | 派生 1 + SUM |
+| etl_dws_员工导购效能 | 8 | F+S+J+C | 7,952 | SQL_SCRIPT 替代 FULL OUTER JOIN |
+| etl_ads_活动权益复盘 | 17 | C+G+F+C+G×2+S+J×3+C | 50 | **混合方案集大成**：派生 1 + 两层 GROUP_BY + SQL_SCRIPT(7天内 JOIN) |
+
+**命名规范**：建议 ETL 名末尾加 `(N节点·F+C+G+S+J)` 缩写后缀，方便和 SQL 三节点版（INPUT+SQL+OUTPUT）区分。
+- F = FILTER_ROWS, C = CALCULATOR, G = GROUP_BY, J = JOIN_DATA, S = SQL_SCRIPT
+- INPUT / OUTPUT 默认省略（每个 ETL 都有）
+
+### §14.5 排查 checklist
+
+跑完 SmartETL execute 后必查（demo 演示前一定要做）：
+
+```bash
+# 1. 行数是否预期范围内 (爆炸到亿级 = 多谓词 JOIN 坑)
+guancli ds get <output_dsid> --brief | grep 行数
+
+# 2. 预览前 5 行, 重点看 COUNT_DISTINCT 字段是否变成 ID 字符串
+guancli ds preview <output_dsid> --limit 5
+
+# 3. 反查 GROUP_BY 节点 aggrType 是否被改 NUL
+guancli fetch GET "/api/etl/<dfId>" | jq '.response.actions[] | select(.type=="GROUP_BY") | .zoneData.metric[] | {name, aggrType}'
+
+# 4. JOIN_DATA 节点检查 predicates 数量 (任何 > 1 都是潜在笛卡尔积爆炸)
+guancli fetch GET "/api/etl/<dfId>" | jq '.response.actions[] | select(.type=="JOIN_DATA") | .dataFusion.columnFuses[].predicates | length'
+
+# 5. 反查 actions 数量是否等于发出去的 (少 1 = FULL_OUTER 被吞)
+guancli fetch GET "/api/etl/<dfId>" | jq '.response.actions | length'
+```

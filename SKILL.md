@@ -1,9 +1,9 @@
 ---
 name: majia-guanyuan
-description: 观远 BI（Guandata）全链路操作 — 数据查询/建卡/取数（Part A）、ETL 治理/写入/删除（Part B，含 SmartETL 全链路重写 + 字段使用度审计 + ExecPlan 工程化）、自定义图表 HTML/CSS/JS 注入与排障（Part C，含 HTML 应用化看板生成 + selector 联动 descriptor patch）、**V7 Page/Card 发布流水线 + 三态硬规则（Part D，V2.1.6 新增：guanvis-skill 一键 publish / CSV 三态判断 / Spark CTE 中文别名坑 / ETL update dsId 注入）**，以及**餐饮 BI 公式实战库**（V2.1.5 新增：60+ SQL 公式 / RFM 8 类营销策略 / AC/ADS/ADT/Comp 营收 KPI / 6 大 ETL 工程范式 / 39 ETL 索引）。当用户提到 营业额/门店/会员/订单/建卡/取数/报表/ETL/direct-save/payload_json/自定义图表/HTML 看板/应用化/更高级/不限标准看板/观远/Guandata/BI/v7 BI/草稿 60004/CSV 散客 100% 假指标/Spark CTE 中文别名/1012 同名文件/guanvis-skill/复购率/客单价/RFM/DWD 宽表/财务双源对账/AC/ADS/Comp 老店 时使用。马甲业务实战版，60+ ETL 战例、10 类报错手册、Claude Code/OpenClaw/Codex/Hermes 通用。
+description: 观远 BI（Guandata）全链路操作 — 数据查询/建卡/取数（Part A）、ETL 治理/写入/删除（Part B，含 SmartETL 全链路重写 + 字段使用度审计 + ExecPlan 工程化）、自定义图表 HTML/CSS/JS 注入与排障（Part C，含 HTML 应用化看板生成 + selector 联动 descriptor patch）、**V7 Page/Card 发布流水线 + 三态硬规则 + SmartETL 节点化两大静默坑（Part D，V2.1.8 新增：GROUP_BY 节点 STRING COUNT_DISTINCT 被改 NUL / JOIN_DATA 节点只取 predicates[0] 多键 JOIN 笛卡尔积 / FULL_OUTER 节点被静默吞 / 两层 GROUP_BY 模拟去重；V2.1.6 已有：guanvis-skill 一键 publish / CSV 三态判断 / Spark CTE 中文别名坑 / ETL update dsId 注入）**，以及**餐饮 BI 公式实战库**（V2.1.5 新增：60+ SQL 公式 / RFM 8 类营销策略 / AC/ADS/ADT/Comp 营收 KPI / 6 大 ETL 工程范式 / 39 ETL 索引）。当用户提到 营业额/门店/会员/订单/建卡/取数/报表/ETL/direct-save/payload_json/自定义图表/HTML 看板/应用化/更高级/不限标准看板/观远/Guandata/BI/v7 BI/草稿 60004/CSV 散客 100% 假指标/Spark CTE 中文别名/1012 同名文件/guanvis-skill/复购率/客单价/RFM/DWD 宽表/财务双源对账/AC/ADS/Comp 老店/SmartETL 节点化/COUNT_DISTINCT 输出空/aggrType NUL/JOIN 多谓词笛卡尔积/FULL_OUTER 被吞/两层 GROUP_BY 模拟去重 时使用。马甲业务实战版，60+ ETL 战例、10 类报错手册、Claude Code/OpenClaw/Codex/Hermes 通用。
 license: MIT
 metadata:
-  version: "2.1.7"
+  version: "2.1.8"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-guanyuan
   openclaw:
@@ -27,7 +27,7 @@ metadata:
           - guancli
 ---
 
-# 观远 BI · 马甲专版（V2.1.7）
+# 观远 BI · 马甲专版（V2.1.8）
 
 > **结构说明（V1.5.0 引入 progressive disclosure）**：本文档是**路由层 + 关键规则**，详细操作手册下沉到 `references/`。每个 Part 的入口章节会指出"何时回到 references/ 查全表"。完整章节索引见末尾的 [📚 References 目录](#-references-目录)。
 

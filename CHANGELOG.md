@@ -5,6 +5,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project follows [Semantic Versioning](https://semver.org/) — see SKILL.md for
 the project's specific patch / minor / major rules.
 
+## [2.1.8] — 2026-05-21
+
+### Added
+
+- **`references/v7-page-card-publish-pipeline.md` 新增 §14 SmartETL 节点化两大静默坑**
+  —— 来自同一天演示项目把 6 个 ETL 从"全 SQL 三节点版"改成"花式 SmartETL 节点链
+  版"实战。把 SQL 三节点拆成 8-17 个节点（INPUT / FILTER_ROWS / CALCULATOR /
+  GROUP_BY / JOIN_DATA / SQL_SCRIPT / OUTPUT）时，踩到两个**永远不会出错误日志**
+  的静默坑——save 返回 success，execute FINISHED，但数据全错（COUNT_DISTINCT
+  字段变成 ID 字符串、JOIN 行数从 10 万爆到 900 万）。这是 demo 演示前一定要查的
+  最致命的坑。
+  - **§14.1 GROUP_BY 节点不支持 STRING 字段的 COUNT / COUNT_DISTINCT** ——
+    BI 把 `aggrType: "COUNT_DISTINCT"` **静默改成 `aggrType: "NUL"`**，等于
+    没聚合，输出取了原字段第一个值。修复策略 A：业务唯一字段（订单ID）→
+    前置 CALC 派生 1 + GROUP_BY SUM；策略 B：真去重（会员ID）→ **两层
+    GROUP_BY 模拟去重**（第一层把粒度细化到去重字段，第二层 SUM 派生 1）；
+    策略 C：SQL_SCRIPT 旁路 + JOIN（注意 §14.2 多谓词坑）。
+  - **§14.2 JOIN_DATA 节点不支持多谓词** —— `predicates` 数组虽然能传 N 个，
+    但 BI 执行时**只用 `predicates[0]`**，第二个及之后全部忽略 → 笛卡尔积爆炸。
+    operator=EQ 加了无效，拆 columnFuses 被拒收。唯一修复：**用 SQL_SCRIPT
+    替代多键 JOIN**。单键 JOIN 仍走 JOIN_DATA 节点。同时附 FULL_OUTER joinType
+    也会被静默吞掉的坑（actions 数量比发出去的少 1 → 下游 `key not found`）。
+  - **§14.3 SmartETL builder 函数库参考实现** —— `smart_etl_builder.py` 的
+    `node_group_by` / `node_join` 工厂函数文档注释里固定写两个坑的提示，
+    aggrType=COUNT/COUNT_DISTINCT 自动把 fdType 改成 LONG，避免 BI 直接拒收。
+  - **§14.4 6 个 SmartETL 标杆实战节点链** —— 演示沉淀的 6 个 ETL（10/10/10/8/8/17
+    节点）对应的节点链缩写表 + 关键技巧，含命名规范（ETL 名末尾加
+    `(N节点·F+C+G+S+J)` 后缀方便和 SQL 三节点版区分）。
+  - **§14.5 排查 checklist** —— 5 条 demo 演示前必跑的 `guancli` 自检命令，
+    覆盖行数验证 / 预览前 5 行 / 反查 aggrType=NUL / 检查 predicates 数量 /
+    比对 actions 数量。
+
+### Changed
+
+- **`SKILL.md` frontmatter `description` 加入 V2.1.8 关键触发词** —— 在 Part D
+  描述前缀加入"SmartETL 节点化两大静默坑"，触发词集合增加：SmartETL 节点化 /
+  COUNT_DISTINCT 输出空 / aggrType NUL / JOIN 多谓词笛卡尔积 / FULL_OUTER 被吞 /
+  两层 GROUP_BY 模拟去重。保证用户撞到这些字面 token 时能正确路由到本 skill。
+
+- **`SKILL.md` 主标题 `# 观远 BI · 马甲专版（V2.1.7）` → `（V2.1.8）`** ——
+  版本号同步。
+
 ## [2.1.7] — 2026-05-21
 
 ### Changed
