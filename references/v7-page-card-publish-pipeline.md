@@ -608,3 +608,184 @@ guancli fetch GET "/api/etl/<dfId>" | jq '.response.actions[] | select(.type=="J
 # 5. 反查 actions 数量是否等于发出去的 (少 1 = FULL_OUTER 被吞)
 guancli fetch GET "/api/etl/<dfId>" | jq '.response.actions | length'
 ```
+
+---
+
+## §15 customChart 三大坑 + autoBootstrap + chip toolbar 兜底（2026-05-21 沉淀）
+
+> **来源**：把 8 个 HTML SDK customChart 看板 + selector 联动调通的实战。HTML SDK customChart 在 v7 BI 实例上有**三个嵌套坑**，每一个都让 demo 演示当场卡死。
+>
+> **何时读这里**：customChart 渲染时持续显示"看板加载中..." / selector 选了店型但看板数据不变 / `renderChart` 函数定义了但 BI 没调用。
+
+### §15.1 BI 不自动调 `renderChart`（首发坑）
+
+**现象**：customChart iframe 加载完成、`renderChart` 函数已定义、`echarts` 已加载、4 个 dataView 的 `/api/card/<dvId>/data` API 单独 fetch 都能拿到数据，但根 div 永远显示 `"看板加载中..."`，BI 永远不调用 iframe 内的 `renderChart`。
+
+**根因**：v7 BI 的 customChart 渲染调度有 race condition——多 dataView 并发 fetch 时，BI 内部状态机有时认为某个 dataView 还在 pending，永远不触发 `renderChart(data)` 回调。同一份代码 03-tasks 看板能跑通，07-profit-health 不行，BI 自身没有重试机制。
+
+**唯一兜底**：iframe 内部加 `autoBootstrap` — 5s 后若根 div 仍是"加载中"，主动 fetch customChart cdId 的 `/api/card/<cdId>/data`，手动喂 `renderChart`：
+
+```javascript
+// charts/<dashboard>.js 最顶部
+(function autoBootstrap() {
+  setTimeout(function() {
+    try {
+      var root = document.getElementById('dash-root');
+      if (!root || root.innerText.indexOf('加载中') < 0) return;  // 已渲染
+      var cdId = '<customChartId>';  // 写死的 customChart ID
+      fetch(window.parent.location.origin + '/api/card/' + cdId + '/data', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}',
+        credentials: 'include',
+      }).then(function(r){return r.json();}).then(function(j){
+        if (!j.viewData) return;
+        var data = j.viewData.map(function(v){return v.chartMain.columns;});
+        if (typeof renderChart === 'function') renderChart(data, function(){}, {});
+      });
+    } catch(e) { console.error('autoBootstrap fail:', e); }
+  }, 4000);
+})();
+```
+
+**关键参数**：
+- `cdId` 是**customChart 本身**的 cdId（不是任何单个 dataView 的 cdId）。`POST /api/card/<cdId>/data` 会一次性返回所有 dataView 的数据，按 `viewData[].chartMain.columns` 结构（与 BI 标准 `renderChart(data)` 入参格式一致）。
+- 4 秒延迟足够让 BI 自身首次渲染机会，超时再兜底；调太短会和 BI race condition 冲突。
+- `credentials: 'include'` 必须，否则 fetch 走匿名身份，BI 返回 401。
+- iframe 的 `window.parent.location.origin` 用来拼绝对 URL，避免 iframe 内部 cross-origin。
+
+### §15.2 selector 联动 customChart **失败**（连环坑）
+
+**现象**：autoBootstrap 让 customChart 渲染了，但顶部 selector 选了店型 + 点查询，customChart 数据**不变**——KPI 仍然全网汇总。
+
+**根因 1（核心）**：BI selector 标准联动机制依赖 BI server 在收到 `/api/card/<cdId>/data` POST 请求时，从**当前 page session 状态**读取 selector filter 注入 SQL。但 autoBootstrap 的 fetch **绕过了** BI 标准前端流程（不走 BI redux dispatch），server 端无法关联 page 的 selector state。
+
+**根因 2（API 不接受 body filter）**：实测 5 种 POST body filter 格式 BI 全不认：
+```javascript
+// 实测都不生效（返回值与 body={} 完全相同）
+body: '{"filters": [...]}'           // ❌
+body: '{"globalFilters": [...]}'     // ❌
+body: '{"filterConditions": [...]}'  // ❌
+body: '{"selectorFilters": [...]}'   // ❌
+body: '{"cardFilters": [...]}'       // ❌
+body: '{"whereSegments": [...]}'     // ❌
+body: '{"extraFilters": [...]}'      // ❌
+```
+**结论**：BI `/api/card/<cdId>/data` 这个 endpoint **不接受任何 body filter 参数**，必须配合 session/cookie 状态。
+
+**根因 3（BI SDK 存在但难用）**：BI 父页暴露 `window.PAGE_DATA_SDK` 构造器，原型上有：
+- `getCardData(cardId)` / `getAllCardsData()` — 带 selector filter 拉数据
+- `updateSelectorValue` / `waitForSelectorsResolved`
+- `scopeEventEmitter` — 事件订阅
+
+但 `new PAGE_DATA_SDK()` + `.initPage()` 需要 BI 内部初始化好的 page context（`pgId` 等），iframe 内部和外部传入 `{pgId}` 都报 `Cannot read properties of undefined (reading 'pgId')`。React fiber 遍历也找不到 BI 自己初始化好的 SDK 实例。**SDK 路径目前走不通**。
+
+### §15.3 终极兜底：**chip toolbar 模式**（推荐）
+
+既然 BI selector 联动不通，**抛弃 BI selector 改在 customChart 内部加 chip toolbar + JS 侧 filter**——完全在 iframe 内闭环，立竿见影：
+
+**Step 1**：每个 dataView 都加 `addRow(f("门店类型"))`（或其他维度）作为筛选字段：
+
+```javascript
+// card_01_html.js
+var dv1 = createCard(ChartType.DATA_GRID, "KPI 汇总")
+    .setId(...)
+    .bindDataset(DS)
+    .addRow(f("门店类型"))           // ← 关键：每个 dataView 都加
+    .addRow(f("直营加盟类型"))
+    .addMetric(f("月营收", { aggrType: AggrType.SUM }))
+    .addMetric(f("店面贡献利润率", { aggrType: AggrType.AVG }));
+// dv1 行数从 2 (按直营加盟) → 18 (9 店型 × 2 直营加盟), 但仍然小
+```
+
+**Step 2**：customChart JS 顶部加 chip toolbar + state：
+
+```javascript
+var ALL_TYPES = ['商场店','社区店','写字楼店','交通店','学校店','夜市店','外卖卫星店','旗舰店','快取店'];
+var activeType = 'ALL';   // 全局 state
+
+function changeType(t) {
+  activeType = t;
+  if (window.__rawData) renderChart(window.__rawData, function(){}, {});  // 重 render
+}
+
+function renderToolbar() {
+  var chips = '<span class="chip ' + (activeType==='ALL'?'active':'') + '" onclick="changeType(\'ALL\')">全部</span>';
+  ALL_TYPES.forEach(function(t) {
+    chips += '<span class="chip ' + (activeType===t?'active':'') + '" onclick="changeType(\'' + t + '\')">' + t + '</span>';
+  });
+  return '<div class="chip-toolbar">📍 门店类型: ' + chips + '</div>';
+}
+
+// renderChart 入口缓存 rawData, 然后 filter + 重聚合
+function renderChart(data, ...) {
+  window.__rawData = data;  // 缓存供 chip 点击复用
+  // 把 columnar viewData 转 行数组方便 filter
+  var dv1Rows = viewToRows(data[0]);
+  if (activeType !== 'ALL') {
+    dv1Rows = dv1Rows.filter(function(r){return r['门店类型'] === activeType;});
+  }
+  // 在 dv1Rows 上重新聚合 KPI / 重新画 ECharts
+  // ...
+}
+
+function viewToRows(view) {
+  if (!view || !view[0]) return [];
+  var n = view[0].data.length;
+  var rows = [];
+  for (var i = 0; i < n; i++) {
+    var row = {};
+    for (var j = 0; j < view.length; j++) row[view[j].name] = view[j].data[i];
+    rows.push(row);
+  }
+  return rows;
+}
+```
+
+**Step 3**：CSS 加 chip 样式（建议加在 dashboard css 顶部）：
+
+```css
+.chip-toolbar { padding: 10px 16px; background: #fff; border-radius: 12px;
+  border: 1px solid #e5e7eb; margin-bottom: 12px; font-size: 12px;
+  color: #6b7280; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.chip { display: inline-block; padding: 4px 12px; margin: 0 2px; border-radius: 14px;
+  background: #f3f4f6; color: #4b5563; cursor: pointer; transition: all 0.15s;
+  font-size: 12px; user-select: none; }
+.chip:hover { background: #e5e7eb; }
+.chip.active { background: linear-gradient(90deg, #d97706 0%, #2563eb 100%);
+  color: #fff; font-weight: 600; }
+```
+
+**效果**（实测 07 单店利润健康）：
+- 点"写字楼店"：KPI 从 1.15 亿 → 2463.9 万、平均利润率 15.3% → 14.6%、严重亏损 378 → 0；所有图表 instant 刷新
+- BI 顶部原 selector 保留但**不用**——视觉道具，告诉用户"这个看板支持筛选"
+- 无需点查询、无需 reload、无 race condition
+
+### §15.4 何时用 selector / 何时用 chip toolbar
+
+| 场景 | 推荐方案 |
+|---|---|
+| 非 customChart（BI 原生柱状图/折线图等） | BI 标准 selector ✅ 联动开箱即用 |
+| customChart 单 dataView 简单图 | BI 标准 selector ✅ 偶尔会失败但概率低 |
+| **customChart 多 dataView 复杂看板** | **chip toolbar 兜底**（强烈推荐） |
+| 维度基数 ≤ 10 的离散筛选（店型/区域/品牌） | **chip toolbar**（点击式 UX 优于下拉） |
+| 维度基数 > 20 / 数值范围 / 日期 | 保留 BI selector + 接受联动失败 |
+
+**chip toolbar 限制**：每个被筛选字段必须出现在所有 dataView 的 `addRow()` 里。dv 行数会 × 维度基数（9 类店型 → 行数 × 9）。对粒度细的 dv（含日期/门店级），行数可能爆——这时改用 SQL_SCRIPT 预聚合一个"看板专用"数据集。
+
+### §15.5 排查 checklist
+
+```javascript
+// iframe 内执行, 看 BI 给 customChart 传数据了没
+(function() {
+  var root = document.getElementById('dash-root');
+  return {
+    rendered: root && root.innerText.indexOf('加载中') < 0,
+    hasRenderFn: typeof renderChart === 'function',
+    hasEcharts: typeof echarts !== 'undefined',
+  };
+})();
+
+// 父页执行, 看 customChart data API 是否返回数据
+fetch('/api/card/<customChartId>/data', {method:'POST', body:'{}',
+  headers:{'Content-Type':'application/json'}, credentials:'include'})
+  .then(r=>r.json()).then(j=>console.log(j.viewData?.length, 'views'));
+```

@@ -5,6 +5,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project follows [Semantic Versioning](https://semver.org/) — see SKILL.md for
 the project's specific patch / minor / major rules.
 
+## [2.1.9] — 2026-05-21
+
+### Added
+
+- **`references/v7-page-card-publish-pipeline.md` §15 customChart 三大坑 + autoBootstrap + chip toolbar 兜底**
+  —— 来自同一天把 8 个 HTML SDK customChart 看板 + selector 联动调通的实战。
+  v7 BI 实例上 HTML customChart 有三个嵌套坑，每一个单独都让 demo 演示当场卡死。
+  - **§15.1 BI 不自动调 `renderChart`** —— iframe 加载完成、`renderChart` 已定义、
+    单 dataView fetch 都能拿到数据，但根 div 永远显示"看板加载中..."。同一份代码
+    03-tasks 能跑、07-profit-health 不能跑。BI 内部状态机 race condition，自身
+    无重试。唯一兜底：iframe 顶部加 `autoBootstrap`，5s 后若仍"加载中"则主动
+    fetch `POST /api/card/<customChartId>/data` 拿全部 viewData 手动喂 `renderChart`。
+    含完整代码模板（fetch + credentials + parent.location.origin 拼绝对 URL）。
+  - **§15.2 selector 联动 customChart 失败** —— autoBootstrap 让看板渲染了，
+    但顶部 selector 选店型不联动。三个根因连环：(1) autoBootstrap fetch 绕过
+    BI redux dispatch，server 无法关联 selector state；(2) **实测 7 种 body
+    filter 格式 BI 全不认**（`filters` / `globalFilters` / `filterConditions` /
+    `selectorFilters` / `cardFilters` / `whereSegments` / `extraFilters`），
+    `/api/card/<cdId>/data` 不接受任何 body filter；(3) `window.PAGE_DATA_SDK`
+    构造器存在并暴露 `getCardData` / `updateSelectorValue` / `scopeEventEmitter`，
+    但 `.initPage()` 卡在 `Cannot read properties of undefined (reading 'pgId')`，
+    iframe 内外、React fiber 都找不到现成 SDK 实例。
+  - **§15.3 终极兜底 chip toolbar 模式（强烈推荐）** —— 抛弃 BI selector 改在
+    customChart 内部加 chip toolbar + JS 侧 filter，完全在 iframe 内闭环。三步：
+    每个 dataView 加 `addRow(f("门店类型"))` → JS 顶部加 `ALL_TYPES + activeType` state
+    和 `changeType()` re-render → CSS 加 `.chip` / `.chip.active` 渐变样式。实测
+    07 单店利润健康：点"写字楼店" KPI 1.15 亿 → 2463.9 万、严重亏损 378 → 0
+    instant 刷新，无需点查询/F5。
+  - **§15.4 何时用 selector / 何时用 chip toolbar** —— customChart 多 dataView
+    复杂看板强烈推荐 chip toolbar；维度基数 ≤ 10 的离散筛选（店型/区域/品牌）
+    chip 点击 UX 优于下拉；> 20 基数 / 数值范围 / 日期保留 BI selector。
+  - **§15.5 排查 checklist** —— iframe 内 / 父页 两段验证代码片段。
+
+### Changed
+
+- **`SKILL.md` frontmatter `description` 加入 V2.1.9 关键触发词** —— Part D
+  描述追加"customChart 渲染/联动三大坑 + chip toolbar 兜底"，触发词集合增加：
+  customChart 看板加载中 / renderChart 不调 / autoBootstrap / PAGE_DATA_SDK /
+  selector 联动失败 / chip toolbar。
+
+- **`SKILL.md` 主标题 `# 观远 BI · 马甲专版（V2.1.8）` → `（V2.1.9）`** —— 版本同步。
+
 ## [2.1.8] — 2026-05-21
 
 ### Added
